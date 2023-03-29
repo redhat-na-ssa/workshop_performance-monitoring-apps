@@ -10,9 +10,34 @@ projects:
         revision: main
 components:
 ### PODs
-  - name: mycomponent
+  - name: postgres
     kubernetes:
-      uri: ./infrastructure/postgres.yaml
+      # uri: ./infrastructure/postgres-deployment.yaml
+      inlined:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: "jbo-test"
+        spec:
+          template:
+            metadata:
+              name: job-test
+            spec:
+              restartPolicy: Never
+              containers:
+              - name: post-install-job
+                image: "registry.access.redhat.com/ubi8/ubi-minimal:latest"
+                command: 
+                - /bin/sh
+                - -c 
+                - |
+                  echo "WELCOME TO test"
+                  echo "-------------------------------------------------"
+                  echo "Here we could now do initialization work."
+                  echo "Like filling our DB with some data or what's so ever"
+                  echo "..."
+
+                  sleep 10
 ### Workspace Tools Container
   - name: tools
     container:
