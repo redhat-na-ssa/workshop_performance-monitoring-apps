@@ -13,7 +13,7 @@ components:
   - name: postgres
     kubernetes:
       # uri: ./infrastructure/postgres-deployment.yaml
-      inlined:
+      inlined: |
         apiVersion: batch/v1
         kind: Job
         metadata:
