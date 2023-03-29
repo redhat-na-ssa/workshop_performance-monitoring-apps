@@ -1,4 +1,4 @@
-schemaVersion: 2.1.0
+schemaVersion: 2.2.0
 metadata:
   name: workshop-performance-monitoring-apps
 projects:
@@ -10,34 +10,127 @@ projects:
         revision: main
 components:
 ### PODs
-  - name: postgres
-    kubernetes:
-      # uri: ./infrastructure/postgres-deployment.yaml
+  - name: innerloop-postgres-deploy
+    openshift:
+      # uri: ./infrastructure/postgres-deployment.yaml # not working on DevSpaces 3.5.0!!!
+      deployByDefault: false
+      endpoints:
+        - exposure: public
+          name: postgres
+          protocol: tcp
+          targetPort: 5432
       inlined: |
-        apiVersion: batch/v1
-        kind: Job
-        metadata:
-          name: "jbo-test"
-        spec:
-          template:
+        apiVersion: v1
+        kind: List
+        items:
+          - kind: DeploymentConfig
+            apiVersion: apps.openshift.io/v1
             metadata:
-              name: job-test
+            name: postgresql
+            labels:
+              template: postgresql-ephemeral-template
             spec:
-              restartPolicy: Never
-              containers:
-              - name: post-install-job
-                image: "registry.access.redhat.com/ubi8/ubi-minimal:latest"
-                command: 
-                - /bin/sh
-                - -c 
-                - |
-                  echo "WELCOME TO test"
-                  echo "-------------------------------------------------"
-                  echo "Here we could now do initialization work."
-                  echo "Like filling our DB with some data or what's so ever"
-                  echo "..."
-
-                  sleep 10
+              strategy:
+                type: Recreate
+                recreateParams:
+                  timeoutSeconds: 600
+                resources: {}
+                activeDeadlineSeconds: 21600
+              triggers:
+                - type: ImageChange
+                  imageChangeParams:
+                    automatic: true
+                    containerNames:
+                      - postgresql
+                    from:
+                      kind: ImageStreamTag
+                      namespace: openshift
+                      name: 'postgresql:latest'
+                - type: ConfigChange
+              replicas: 1
+              revisionHistoryLimit: 10
+              test: false
+              selector:
+                name: postgresql
+              template:
+                metadata:
+                  creationTimestamp: null
+                  labels:
+                    name: postgresql
+                spec:
+                  volumes:
+                    - name: postgresql-data
+                      emptyDir: {}
+                  containers:
+                    - resources:
+                        limits:
+                          memory: 512Mi
+                      readinessProbe:
+                        exec:
+                          command:
+                            - /usr/libexec/check-container
+                        initialDelaySeconds: 5
+                        timeoutSeconds: 1
+                        periodSeconds: 10
+                        successThreshold: 1
+                        failureThreshold: 3
+                      terminationMessagePath: /dev/termination-log
+                      name: postgresql
+                      livenessProbe:
+                        exec:
+                          command:
+                            - /usr/libexec/check-container
+                            - '--live'
+                        initialDelaySeconds: 120
+                        timeoutSeconds: 10
+                        periodSeconds: 10
+                        successThreshold: 1
+                        failureThreshold: 3
+                      env:
+                        - name: POSTGRESQL_USER
+                          value: postgres
+                        - name: POSTGRESQL_PASSWORD
+                          value: password
+                        - name: POSTGRESQL_DATABASE
+                          value: postgres
+                      securityContext:
+                        capabilities: {}
+                        privileged: false
+                      ports:
+                        - containerPort: 5432
+                          protocol: TCP
+                      imagePullPolicy: IfNotPresent
+                      volumeMounts:
+                        - name: postgresql-data
+                          mountPath: /var/lib/pgsql/data
+                      terminationMessagePolicy: File
+                      image: >-
+                        image-registry.openshift-image-registry.svc:5000/openshift/postgresql
+                  restartPolicy: Always
+                  terminationGracePeriodSeconds: 30
+                  dnsPolicy: ClusterFirst
+                  securityContext: {}
+                  schedulerName: default-scheduler
+          - kind: Service
+            apiVersion: v1
+            metadata:
+              name: postgresql
+              labels:
+                template: postgresql-ephemeral-template
+              annotations:
+                template.openshift.io/expose-uri: 'postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}'
+            spec:
+              ports:
+                - name: postgresql
+                  protocol: TCP
+                  port: 5432
+                  targetPort: 5432
+              internalTrafficPolicy: Cluster
+              type: ClusterIP
+              ipFamilyPolicy: SingleStack
+              sessionAffinity: None
+              selector:
+                name: postgresql
 ### Workspace Tools Container
   - name: tools
     container:
@@ -80,6 +173,10 @@ components:
     volume:
       size: 1G
 commands:
+### Resources Apply commands
+  - id: deploy-local-postgres
+    apply:
+      component: innerloop-postgres-deploy
 ### Quarkus inner-loop commands
   - id: quarkus-package-jvm
     exec:
@@ -92,7 +189,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-package-native
     exec:
-      label: Package Native
+      label: Quarkus - Package Native
       commandLine: './mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=6G'
       component: tools
       group:
@@ -117,7 +214,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/quarkus-app/target'
   - id: quarkus-deploy-on-openshift
     exec:
-      label: Build and Deploy on Openshift
+      label: Quarkus - Build and Deploy on Openshift
       commandLine: 'oc project ${DEVWORKSPACE_NAMESPACE}; ./mvnw clean package -DskipTests -Dquarkus.kubernetes.deploy=true -Dquarkus.container-image.builder=openshift'
       component: tools
       group:
@@ -142,14 +239,6 @@ commands:
         isDefault: true
         kind: run
       workingDir: '${PROJECT_SOURCE}/micronaut-app/'
-  - id: mn-deploy-on-openshift
-    exec:
-      label: Build and Deploy on Openshift
-      commandLine: 'oc project ${DEVWORKSPACE_NAMESPACE}; ./mvnw clean package -DskipTests -Dquarkus.kubernetes.deploy=true -Dquarkus.container-image.builder=openshift'
-      component: tools
-      group:
-        kind: run
-      workingDir: '${PROJECT_SOURCE}/micronaut-app/'
 ### SpringBoot inner-loop commands
   - id: sb-package-jvm
     exec:
@@ -167,14 +256,6 @@ commands:
       component: tools
       group:
         isDefault: true
-        kind: run
-      workingDir: '${PROJECT_SOURCE}/springboot-app/'
-  - id: sb-deploy-on-openshift
-    exec:
-      label: Build and Deploy on Openshift
-      commandLine: 'oc project ${DEVWORKSPACE_NAMESPACE}; ./mvnw clean package -DskipTests -Dquarkus.kubernetes.deploy=true -Dquarkus.container-image.builder=openshift'
-      component: tools
-      group:
         kind: run
       workingDir: '${PROJECT_SOURCE}/springboot-app/'
 ### Common commands
