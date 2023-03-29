@@ -39,7 +39,7 @@ bin/
 nb-configuration.xml
 
 # Visual Studio Code
-.vscode
+# .vscode # we need .vscode for DevSpaces!
 .factorypath
 
 # OSX
