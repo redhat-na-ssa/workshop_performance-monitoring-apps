@@ -44,4 +44,5 @@
         "com",
         ""
       ],
+      "java.compile.nullAnalysis.mode": "disabled",
 }

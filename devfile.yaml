@@ -151,7 +151,7 @@ commands:
   - id: deploy-postgresql
     exec:
       label: Deploy a PostgreSQL instance
-      commandLine: '${PROJECT_SOURCE}/infrastructure/deploy_pg_using_template.sh'
+      commandLine: '${PROJECT_SOURCE}/infrastructure/deploy_pg_using_operator.sh'
       component: tools
       group:
         kind: run
