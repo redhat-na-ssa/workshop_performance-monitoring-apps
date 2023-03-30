@@ -1,0 +1,7 @@
+{
+  "user": "postgres",
+  "password": "aS7c76fZJGIwmILNpCAelbjZ",
+  "host": "postgres-primary.user1-devspaces.svc",
+  "dbname": "postgres",
+  "uri": "postgresql://postgres:aS7c76fZJGIwmILNpCAelbjZ@postgres-primary.user1-devspaces.svc:5432/postgres"
+}

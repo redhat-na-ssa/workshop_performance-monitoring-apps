@@ -4,7 +4,7 @@ OPERATOR_API_GROUP="postgres-operator.crunchydata.com"
 oc project ${DEVWORKSPACE_NAMESPACE}
 
 echo
-echo "Check if the Crunchdata Postgres Operator is present."
+echo "Check if the Crunchydata Postgres Operator is present."
 oc api-resources --api-group=$OPERATOR_API_GROUP
 if [[ $? -gt 0 ]] 
 then
@@ -35,9 +35,15 @@ then
   oc wait --for=condition=Ready $podname
   echo "then you can connect to it using the following properties:"
   echo
-  oc get secret postgres-pguser-postgres -o json | \ 
-     jq '{ user: .data.user | @base64d, password: .data.password | @base64d, host: .data.host | @base64d, dbname: .data.dbname | @base64d, uri: .data.uri | @base64d, verifier: .data.verifier | @base64d }' \
-     > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
+
+  oc get secret postgres-pguser-postgres -o json | ./infrastructure/jq '{ 
+      user: .data.user | @base64d, 
+      password: .data.password | @base64d, 
+      host: .data.host | @base64d, 
+      dbname: .data.dbname | @base64d, 
+      uri: .data.uri | @base64d
+      }' > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
+
   cat ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
    # sample output
    # {

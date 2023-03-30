@@ -10,6 +10,8 @@ spec:
     name: db-init
   users:
     - name: postgres
+      databases:
+        - "postgres"
       password:
         type: AlphaNumeric
   instances:
