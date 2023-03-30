@@ -9,128 +9,17 @@ projects:
       checkoutFrom:
         revision: main
 components:
-### PODs
-  - name: innerloop-postgres-deploy
-    openshift:
-      # uri: ./infrastructure/postgres-deployment.yaml # not working on DevSpaces 3.5.0!!!
-      deployByDefault: false
-      endpoints:
-        - exposure: public
-          name: postgres
-          protocol: tcp
-          targetPort: 5432
-      inlined: |
-        apiVersion: v1
-        kind: List
-        items:
-          - kind: DeploymentConfig
-            apiVersion: apps.openshift.io/v1
-            metadata:
-            name: postgresql
-            labels:
-              template: postgresql-ephemeral-template
-            spec:
-              strategy:
-                type: Recreate
-                recreateParams:
-                  timeoutSeconds: 600
-                resources: {}
-                activeDeadlineSeconds: 21600
-              triggers:
-                - type: ImageChange
-                  imageChangeParams:
-                    automatic: true
-                    containerNames:
-                      - postgresql
-                    from:
-                      kind: ImageStreamTag
-                      namespace: openshift
-                      name: 'postgresql:latest'
-                - type: ConfigChange
-              replicas: 1
-              revisionHistoryLimit: 10
-              test: false
-              selector:
-                name: postgresql
-              template:
-                metadata:
-                  creationTimestamp: null
-                  labels:
-                    name: postgresql
-                spec:
-                  volumes:
-                    - name: postgresql-data
-                      emptyDir: {}
-                  containers:
-                    - resources:
-                        limits:
-                          memory: 512Mi
-                      readinessProbe:
-                        exec:
-                          command:
-                            - /usr/libexec/check-container
-                        initialDelaySeconds: 5
-                        timeoutSeconds: 1
-                        periodSeconds: 10
-                        successThreshold: 1
-                        failureThreshold: 3
-                      terminationMessagePath: /dev/termination-log
-                      name: postgresql
-                      livenessProbe:
-                        exec:
-                          command:
-                            - /usr/libexec/check-container
-                            - '--live'
-                        initialDelaySeconds: 120
-                        timeoutSeconds: 10
-                        periodSeconds: 10
-                        successThreshold: 1
-                        failureThreshold: 3
-                      env:
-                        - name: POSTGRESQL_USER
-                          value: postgres
-                        - name: POSTGRESQL_PASSWORD
-                          value: password
-                        - name: POSTGRESQL_DATABASE
-                          value: postgres
-                      securityContext:
-                        capabilities: {}
-                        privileged: false
-                      ports:
-                        - containerPort: 5432
-                          protocol: TCP
-                      imagePullPolicy: IfNotPresent
-                      volumeMounts:
-                        - name: postgresql-data
-                          mountPath: /var/lib/pgsql/data
-                      terminationMessagePolicy: File
-                      image: >-
-                        image-registry.openshift-image-registry.svc:5000/openshift/postgresql
-                  restartPolicy: Always
-                  terminationGracePeriodSeconds: 30
-                  dnsPolicy: ClusterFirst
-                  securityContext: {}
-                  schedulerName: default-scheduler
-          - kind: Service
-            apiVersion: v1
-            metadata:
-              name: postgresql
-              labels:
-                template: postgresql-ephemeral-template
-              annotations:
-                template.openshift.io/expose-uri: 'postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}'
-            spec:
-              ports:
-                - name: postgresql
-                  protocol: TCP
-                  port: 5432
-                  targetPort: 5432
-              internalTrafficPolicy: Cluster
-              type: ClusterIP
-              ipFamilyPolicy: SingleStack
-              sessionAffinity: None
-              selector:
-                name: postgresql
+### kubernetes/openshift resources
+  # - name: innerloop-postgres-deploy
+  #   openshift:
+  #     # uri: ./infrastructure/postgres-deployment.yaml # not working on DevSpaces 3.5.0!!!
+  #     deployByDefault: false
+  #     endpoints:
+  #       - exposure: public
+  #         name: postgres
+  #         protocol: tcp
+  #         targetPort: 5432
+  #     inlined: |
 ### Workspace Tools Container
   - name: tools
     container:
@@ -151,7 +40,7 @@ components:
       volumeMounts:
         - name: m2
           path: /home/user/.m2
-      memoryLimit: 6Gi
+      memoryLimit: 8Gi
       memoryRequest: 4Gi
       cpuRequest: 1000m
       cpuLimit: 2000m
@@ -174,13 +63,13 @@ components:
       size: 1G
 commands:
 ### Resources Apply commands
-  - id: deploy-local-postgres
-    apply:
-      component: innerloop-postgres-deploy
+  # - id: deploy-local-postgres
+  #   apply:
+  #     component: innerloop-postgres-deploy
 ### Quarkus inner-loop commands
   - id: quarkus-package-jvm
     exec:
-      label: Quarkus - package
+      label: Quarkus - JVM Package
       commandLine: './mvnw clean package -Dquarkus.container-image.build=false -Dquarkus.container-image.builder=openshift'
       component: tools
       group:
@@ -189,7 +78,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-package-native
     exec:
-      label: Quarkus - Package Native
+      label: Quarkus - Native Package
       commandLine: './mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=6G'
       component: tools
       group:
@@ -197,7 +86,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-start-dev
     exec:
-      label: Quarkus - Start Development mode (Hot reload + debug)
+      label: Quarkus - Start in dev mode (Hot reload + debug)
       commandLine: './mvnw compile quarkus:dev -Dquarkus.container-image.build=false -Dquarkus.container-image.builder=openshift'
       component: tools
       group:
@@ -206,7 +95,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-start-native
     exec:
-      label: Quarkus - Start Native
+      label: Quarkus - Start in native
       commandLine: ./quarkus-app-1.0.0-SNAPSHOT-runner
       component: ubi-minimal
       group:
@@ -223,7 +112,7 @@ commands:
 ### Micronaut inner-loop commands
   - id: mn-package-jvm
     exec:
-      label: Micronaut - package
+      label: Micronaut - JVM Package
       commandLine: './mvnw clean package -DskipTests'
       component: tools
       group:
@@ -232,7 +121,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/micronaut-app/'
   - id: mn-start-dev
     exec:
-      label: Micronaut - Start Development mode
+      label: Micronaut - Start in dev mode
       commandLine: './mvnw compile mn:run'
       component: tools
       group:
@@ -242,7 +131,7 @@ commands:
 ### SpringBoot inner-loop commands
   - id: sb-package-jvm
     exec:
-      label: SpringBoot - package
+      label: SpringBoot - JVM Package
       commandLine: './mvnw clean package -DskipTests'
       component: tools
       group:
@@ -251,7 +140,7 @@ commands:
       workingDir: '${PROJECT_SOURCE}/springboot-app/'
   - id: sb-start-dev
     exec:
-      label: SpringBoot - Start Development mode
+      label: SpringBoot - Start in dev mode
       commandLine: './mvnw compile springboot:run'
       component: tools
       group:
@@ -262,7 +151,7 @@ commands:
   - id: deploy-postgresql
     exec:
       label: Deploy a PostgreSQL instance
-      commandLine: '.vscode/deploy_pg_using_operator.sh'
+      commandLine: '${PROJECT_SOURCE}/infrastructure/deploy_pg_using_template.sh'
       component: tools
       group:
         kind: run
