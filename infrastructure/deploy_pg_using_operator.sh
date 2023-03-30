@@ -39,7 +39,7 @@ then
   echo "then you can connect to it using the following properties:"
   echo
 
-  oc get secret postgres-pguser-postgres -o json | ./infrastructure/jq '{ 
+  oc get secret postgres-pguser-postgres -o json | jq '{ 
       user: .data.user | @base64d, 
       password: .data.password | @base64d, 
       host: .data.host | @base64d, 

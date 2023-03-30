@@ -23,8 +23,8 @@ components:
 ### Workspace Tools Container
   - name: tools
     container:
-      # image: quay.io/devfile/universal-developer-image:ubi8-latest # more tools
-      image: registry.redhat.io/devspaces/udi-rhel8:latest
+      image: quay.io/devfile/universal-developer-image:ubi8-latest # upstream
+      # image: registry.redhat.io/devspaces/udi-rhel8:latest
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -161,16 +161,28 @@ commands:
   # - id: apply-switch-java-home
   #   apply:
   #     component: "tools"
-  - id: switch-java-home
+  - id: switch-to-java-11
     exec:
+      label: Switch to Java 11
       component: "tools"
       commandLine: |
-        echo "JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
-        echo "PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
+        sdk default java 11.0.15-tem
+  - id: switch-to-java-17
+    exec:
+      label: Switch to Java 17
+      component: "tools"
+      commandLine: |
+        sdk default java 17.0.3-tem
+      # commandLine: |
+      #   echo "" >> /home/user/.bashrc
+      #   echo "#added during devfile postStart event processing..." >> /home/user/.bashrc
+      #   echo "export JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
+      #   echo "export PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
+        
   # - id: pre-hooks
   #   composite:
   #     commands:
   #       - switch-java-home
 events:
   postStart:
-    - switch-java-home # <== Start of the workspace happens after this command is completed
+    - switch-to-java-17 # <== Start of the workspace happens after this command is completed
