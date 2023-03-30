@@ -23,6 +23,7 @@ components:
 ### Workspace Tools Container
   - name: tools
     container:
+      # image: quay.io/devfile/universal-developer-image:ubi8-latest # more tools
       image: registry.redhat.io/devspaces/udi-rhel8:latest
       env:
         - name: QUARKUS_HTTP_HOST
@@ -156,3 +157,14 @@ commands:
       group:
         kind: run
       workingDir: '${PROJECT_SOURCE}'
+### Pre-hooks
+  - id: pre-setup-tools-container
+    exec:
+      component: "tools"
+      commandLine: |
+        echo "JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
+        echo "PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
+events:
+  preStart:
+    - "pre-setup-tools-container" # <== Start of the workspace happens
+                                  #     after this command is completed
