@@ -158,12 +158,16 @@ commands:
         kind: run
       workingDir: '${PROJECT_SOURCE}'
 ### Pre-hooks
-  - id: pre-setup-tools-container
+  - id: switch-java-home
     exec:
       component: "tools"
       commandLine: |
         echo "JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
         echo "PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
+  - id: pre-hooks
+    composite:
+      commands:
+        - switch-java-home
 events:
   preStart:
     - "pre-setup-tools-container" # <== Start of the workspace happens
