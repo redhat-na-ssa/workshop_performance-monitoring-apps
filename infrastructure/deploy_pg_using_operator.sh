@@ -24,7 +24,10 @@ then
 fi
 
 echo
-echo "Create a PostgreSQL instance using ${OPERATOR_API_GROUP}..."
+echo "Creating db initialization script as a ConfigMap"
+oc create -f ${PROJECT_SOURCE:-$(pwd)}/infrastructure/db-init/db-init-cm.yaml
+echo
+echo "Creating a PostgreSQL instance using ${OPERATOR_API_GROUP}..."
 oc create -f ${PROJECT_SOURCE:-$(pwd)}/infrastructure/postgresdb-cr.yaml
 if [[ $? -eq 0 ]] 
 then
