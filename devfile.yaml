@@ -170,5 +170,4 @@ commands:
         - switch-java-home
 events:
   preStart:
-    - "pre-setup-tools-container" # <== Start of the workspace happens
-                                  #     after this command is completed
+    - pre-hooks # <== Start of the workspace happens after this command is completed
