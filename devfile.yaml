@@ -166,12 +166,14 @@ commands:
       label: Switch to Java 11
       component: "tools"
       commandLine: |
+        [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
         sdk default java 11.0.15-tem
   - id: switch-to-java-17
     exec:
       label: Switch to Java 17
       component: "tools"
       commandLine: |
+        [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
         sdk default java 17.0.3-tem
       # commandLine: |
       #   echo "" >> /home/user/.bashrc
