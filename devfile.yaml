@@ -65,7 +65,7 @@ components:
         - 'hyperfoil-controller.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com:443'
         - '--insecure'
       command:
-        - cli
+        - /deployment/bin/cli.sh
       image: quay.io/hyperfoil/hyperfoil
       memoryLimit: 512M
       cpuLimit: 500m
