@@ -58,19 +58,6 @@ components:
       memoryLimit: 64M
       mountSources: true
       sourceMapping: /projects
-  - name: hyperfoil-load-driver
-    container:
-      args:
-        - 'connect'
-        - 'hyperfoil-controller.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com:443'
-        - '--insecure'
-      command:
-        - /deployment/bin/cli.sh
-      image: quay.io/hyperfoil/hyperfoil
-      memoryLimit: 512M
-      cpuLimit: 500m
-      mountSources: true
-      sourceMapping: /projects
 ### volumes
   - name: m2
     volume:
