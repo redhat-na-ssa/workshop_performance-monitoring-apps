@@ -23,8 +23,8 @@ components:
 ### Workspace Tools Container
   - name: tools
     container:
-      image: quay.io/devfile/universal-developer-image:ubi8-latest # upstream
-      # image: registry.redhat.io/devspaces/udi-rhel8:latest
+      image: quay.io/devfile/universal-developer-image:ubi8-latest # upstream - 3.7GB compressed
+      # image: registry.redhat.io/devspaces/udi-rhel8:latest #1.7GB compressed
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -41,8 +41,8 @@ components:
       volumeMounts:
         - name: m2
           path: /home/user/.m2
-      memoryLimit: 8Gi
-      memoryRequest: 4Gi
+      memoryLimit: 6Gi
+      memoryRequest: 2Gi
       cpuRequest: 1000m
       cpuLimit: 2000m
       mountSources: true
@@ -77,14 +77,14 @@ commands:
         isDefault: true
         kind: build
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
-  - id: quarkus-package-native
-    exec:
-      label: Quarkus - Native Package
-      commandLine: './mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=6G'
-      component: tools
-      group:
-        kind: build
-      workingDir: '${PROJECT_SOURCE}/quarkus-app/'
+  # - id: quarkus-package-native
+  #   exec:
+  #     label: Quarkus - Native Package
+  #     commandLine: './mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=6G'
+  #     component: tools
+  #     group:
+  #       kind: build
+  #     workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-start-dev
     exec:
       label: Quarkus - Start in dev mode (Hot reload + debug)
@@ -94,14 +94,14 @@ commands:
         isDefault: true
         kind: run
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
-  - id: quarkus-start-native
-    exec:
-      label: Quarkus - Start in native
-      commandLine: ./quarkus-app-1.0.0-SNAPSHOT-runner
-      component: ubi-minimal
-      group:
-        kind: run
-      workingDir: '${PROJECT_SOURCE}/quarkus-app/target'
+  # - id: quarkus-start-native
+  #   exec:
+  #     label: Quarkus - Start in native
+  #     commandLine: ./quarkus-app-1.0.0-SNAPSHOT-runner
+  #     component: ubi-minimal
+  #     group:
+  #       kind: run
+  #     workingDir: '${PROJECT_SOURCE}/quarkus-app/target'
   - id: quarkus-deploy-on-openshift
     exec:
       label: Quarkus - Build and Deploy on Openshift
@@ -175,16 +175,23 @@ commands:
       commandLine: |
         [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
         sdk default java 17.0.3-tem
+      # use this block when using the product UDI
       # commandLine: |
       #   echo "" >> /home/user/.bashrc
       #   echo "#added during devfile postStart event processing..." >> /home/user/.bashrc
       #   echo "export JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
       #   echo "export PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
-        
+  # - id: config-git-store
+  #   exec:
+  #     label: Create git credential store
+  #     component: "tools"
+  #     commandLine: |
+  #       git config --global credential.helper store
   # - id: pre-hooks
   #   composite:
   #     commands:
-  #       - switch-java-home
+  #       - switch-to-java-17
+  #       - config-git-store
 events:
   postStart:
     - switch-to-java-17 # <== Start of the workspace happens after this command is completed

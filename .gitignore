@@ -52,3 +52,4 @@ drop.sql
 *.dylib
 .che/che-editor.ignore
 pg-conn-info.json
+.ignored
