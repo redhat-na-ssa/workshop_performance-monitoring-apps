@@ -1,13 +1,13 @@
 schemaVersion: 2.2.0
 metadata:
   name: workshop-performance-monitoring-apps
-projects:
-  - name: workshop-performance-monitoring-apps
-    git:
-      remotes:
-        origin: "https://github.com/redhat-na-ssa/workshop_performance-monitoring-apps.git"
-      checkoutFrom:
-        revision: main
+# projects:
+#   - name: workshop-performance-monitoring-apps
+    # git:
+    #   remotes:
+    #     origin: "https://github.com/redhat-na-ssa/workshop_performance-monitoring-apps.git"
+    #   checkoutFrom:
+    #     revision: main
 components:
 ### kubernetes/openshift resources
   # - name: innerloop-postgres-deploy
