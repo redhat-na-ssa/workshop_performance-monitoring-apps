@@ -123,7 +123,16 @@ commands:
   - id: mn-start-dev
     exec:
       label: Micronaut - Start in dev mode
-      commandLine: './mvnw compile mn:run'
+      commandLine: './mvnw compile -Dmicronaut.environments=dev mn:run'
+      component: tools
+      group:
+        isDefault: true
+        kind: run
+      workingDir: '${PROJECT_SOURCE}/micronaut-app/'
+  - id: mn-test
+    exec:
+      label: Micronaut - Test
+      commandLine: './mvnw test'
       component: tools
       group:
         isDefault: true

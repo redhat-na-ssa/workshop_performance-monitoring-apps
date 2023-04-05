@@ -2,7 +2,8 @@ micronaut:
   application:
     name: MicronautApp
   server:
-    port: 8802
+    port: 8702
+    thread-selection: IO
 netty:
   default:
     allocator:
@@ -22,6 +23,8 @@ jpa:
       hibernate:
         bytecode:
           provider: none
+        # hbm2ddl:
+        #   auto: none
         hbm2ddl:
-          auto: create-drop
+          auto: update
         show_sql: true

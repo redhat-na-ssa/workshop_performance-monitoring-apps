@@ -5,7 +5,8 @@
   <parent>
     <groupId>io.micronaut</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>3.7.2</version>
+    <version>3.8.8</version>
+    <!-- <version>3.7.2</version> -->
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>io.containerapps.javaruntime.workshop.micronaut</groupId>
@@ -18,9 +19,10 @@
     <packaging>jar</packaging>
     <jdk.version>17</jdk.version>
     <release.version>17</release.version>
-    <micronaut.version>3.7.1</micronaut.version>
+    <!-- <micronaut.version>3.7.1</micronaut.version> -->
+    <micronaut.version>3.8.8</micronaut.version>
     <micronaut.runtime>netty</micronaut.runtime>
-    <exec.mainClass>io.containerapps.javaruntime.workshop.micronaut.MicronautApplication</exec.mainClass>
+    <exec.mainClass>io.containerapps.javaruntime.workshop.micronaut.Application</exec.mainClass>
   </properties>
 
   <repositories>
@@ -51,9 +53,16 @@
       <artifactId>micronaut-jdbc-hikari</artifactId>
       <scope>compile</scope>
     </dependency>
+    <!-- during Prod -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- during Dev -->
+    <dependency> 
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -120,6 +129,14 @@
       <plugin>
         <groupId>io.micronaut.build</groupId>
         <artifactId>micronaut-maven-plugin</artifactId>
+          <configuration>
+            <testResourcesDependencies>
+              <dependency>
+                <groupId>io.micronaut.testresources</groupId>
+                <artifactId>micronaut-test-resources-jdbc-postgresql</artifactId>
+              </dependency>
+            </testResourcesDependencies>
+          </configuration>
       </plugin>
 
       <plugin>
