@@ -1,0 +1,14 @@
+FROM registry.access.redhat.com/ubi8/openjdk-17-runtime
+
+ENV LANGUAGE='en_US:en'
+
+# Springboot image layers
+ARG DEPENDENCY=target/dependency
+COPY --chown=185 ${DEPENDENCY}/BOOT-INF/lib /deployments/lib
+COPY --chown=185 ${DEPENDENCY}/META-INF /deployments/META-INF
+COPY --chown=185 ${DEPENDENCY}/BOOT-INF/classes /deployments
+
+EXPOSE 8080
+USER 185
+ENV JAVA_LIB_DIR="lib/*"
+ENV JAVA_MAIN_CLASS="io.containerapps.javaruntime.workshop.springboot.SpringbootApplication"
