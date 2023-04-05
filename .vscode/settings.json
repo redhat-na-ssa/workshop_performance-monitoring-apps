@@ -54,4 +54,6 @@
     ""
   ],
   "java.compile.nullAnalysis.mode": "disabled",
+  "java.server.launchMode": "LightWeight",
+  "microprofile.tools.validation.enabled": false
 }
