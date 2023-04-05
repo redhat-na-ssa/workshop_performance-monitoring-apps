@@ -151,7 +151,16 @@ commands:
   - id: sb-start-dev
     exec:
       label: SpringBoot - Start in dev mode
-      commandLine: './mvnw compile springboot:run'
+      commandLine: './mvnw compile spring-boot:run -Dspring.profiles.active=dev'
+      component: tools
+      group:
+        isDefault: true
+        kind: run
+      workingDir: '${PROJECT_SOURCE}/springboot-app/'
+  - id: sb-test
+    exec:
+      label: SpringBoot - Test
+      commandLine: './mvnw test'
       component: tools
       group:
         isDefault: true
