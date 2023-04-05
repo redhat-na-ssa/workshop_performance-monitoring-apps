@@ -42,9 +42,9 @@ components:
         - name: m2
           path: /home/user/.m2
       memoryLimit: 6Gi
-      memoryRequest: 2Gi
+      memoryRequest: 1Gi
       cpuRequest: 1000m
-      cpuLimit: 2000m
+      cpuLimit: 4000m
       mountSources: true
 # Utility Containers
   - name: ubi-minimal
