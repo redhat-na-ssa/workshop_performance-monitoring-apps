@@ -265,6 +265,7 @@ spec:
             - '--revision-name={{.Service}}-{{.Generation}}'
             # - '--namespace=sandbox'
             - '--limit=cpu=100m,memory=128Mi'
+            - --no-wait
             # - '--env=QUARKUS_PROFILE=dev'
       runAfter:
         - quarkus-image-build
@@ -285,6 +286,7 @@ spec:
             - '--revision-name={{.Service}}-{{.Generation}}'
             # - '--namespace=sandbox'
             - '--limit=cpu=100m,memory=128Mi'
+            - --no-wait
       runAfter:
         - micronaut-image-build
       taskRef:
@@ -304,6 +306,7 @@ spec:
             - '--revision-name={{.Service}}-{{.Generation}}'
             # - '--namespace=sandbox'
             - '--limit=cpu=100m,memory=128Mi'
+            - --no-wait
       runAfter:
         - springboot-image-build
       taskRef:
