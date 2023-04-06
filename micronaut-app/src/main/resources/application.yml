@@ -2,7 +2,7 @@ micronaut:
   application:
     name: MicronautApp
   server:
-    port: 8702
+    port: 8080
     thread-selection: IO
 netty:
   default:
