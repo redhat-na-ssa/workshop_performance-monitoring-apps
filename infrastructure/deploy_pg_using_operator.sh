@@ -36,15 +36,27 @@ then
   sleep 3
   podname=$(oc get pod -o name | grep pod/postgres-instance1)
   oc wait --for=condition=Ready $podname
+
+  # change the auto-generated SCRAM based db password
+  oc patch secret postgres-pguser-postgres -p '{"stringData":{"password":"password","verifier":""}}'
+
   echo "then you can connect to it using the following properties:"
   echo
+
+#   oc get secret postgres-pguser-postgres -o json | jq '{ 
+#       user: .data.user | @base64d, 
+#       password: .data.password | @base64d, 
+#       host: .data.host | @base64d, 
+#       dbname: .data.dbname | @base64d, 
+#       uri: .data.uri | @base64d
+#       }' > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
 
   oc get secret postgres-pguser-postgres -o json | jq '{ 
       user: .data.user | @base64d, 
       password: .data.password | @base64d, 
-      host: .data.host | @base64d, 
+      host: "postgres-ha", 
       dbname: .data.dbname | @base64d, 
-      uri: .data.uri | @base64d
+      uri: "jdbc:postgresql://postgres-ha/postgres"
       }' > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
 
   cat ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
