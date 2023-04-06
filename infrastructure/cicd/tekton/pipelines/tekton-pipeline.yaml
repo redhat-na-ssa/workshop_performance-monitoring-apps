@@ -171,7 +171,7 @@ spec:
       params:
         - name: IMAGE
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name)
+            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):$(tasks.git-clone.results.commit)
         - name: BUILDER_IMAGE
           value: >-
             registry.redhat.io/rhel8/buildah@sha256:ac0b8714cc260c94435cab46fe41b3de0ccbc3d93e38c395fa9d52ac49e521fe
@@ -199,7 +199,7 @@ spec:
       params:
         - name: IMAGE
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name)
+            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):$(tasks.git-clone.results.commit)
         - name: BUILDER_IMAGE
           value: >-
             registry.redhat.io/rhel8/buildah@sha256:ac0b8714cc260c94435cab46fe41b3de0ccbc3d93e38c395fa9d52ac49e521fe
@@ -227,7 +227,7 @@ spec:
       params:
         - name: IMAGE
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name)
+            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):$(tasks.git-clone.results.commit)
         - name: BUILDER_IMAGE
           value: >-
             registry.redhat.io/rhel8/buildah@sha256:ac0b8714cc260c94435cab46fe41b3de0ccbc3d93e38c395fa9d52ac49e521fe
@@ -251,7 +251,64 @@ spec:
       workspaces:
         - name: source
           workspace: shared-workspace
-
+    - name: deploy-quarkus-app
+      params:
+        - name: kn-image
+          value: >-
+            registry.redhat.io/openshift-serverless-1/client-kn-rhel8@sha256:89fb53858bb93ada958faff761915f45d01e3364b5e5df4ba05b01c4b8cde587
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.quarkus-app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name)@$(tasks.quarkus-image-build.results.IMAGE_DIGEST)'
+            - '--revision-name={{.Service}}-{{.Generation}}'
+            # - '--namespace=sandbox'
+            - '--limit=cpu=100m,memory=128Mi'
+            # - '--env=QUARKUS_PROFILE=dev'
+      runAfter:
+        - quarkus-image-build
+      taskRef:
+        kind: ClusterTask
+        name: kn
+    - name: deploy-micronaut-app
+      params:
+        - name: kn-image
+          value: >-
+            registry.redhat.io/openshift-serverless-1/client-kn-rhel8@sha256:89fb53858bb93ada958faff761915f45d01e3364b5e5df4ba05b01c4b8cde587
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.micronaut-app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name)@$(tasks.micronaut-image-build.results.IMAGE_DIGEST)'
+            - '--revision-name={{.Service}}-{{.Generation}}'
+            # - '--namespace=sandbox'
+            - '--limit=cpu=100m,memory=128Mi'
+      runAfter:
+        - micronaut-image-build
+      taskRef:
+        kind: ClusterTask
+        name: kn
+    - name: deploy-springboot-app
+      params:
+        - name: kn-image
+          value: >-
+            registry.redhat.io/openshift-serverless-1/client-kn-rhel8@sha256:89fb53858bb93ada958faff761915f45d01e3364b5e5df4ba05b01c4b8cde587
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.springboot-app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name)@$(tasks.springboot-image-build.results.IMAGE_DIGEST)'
+            - '--revision-name={{.Service}}-{{.Generation}}'
+            # - '--namespace=sandbox'
+            - '--limit=cpu=100m,memory=128Mi'
+      runAfter:
+        - springboot-image-build
+      taskRef:
+        kind: ClusterTask
+        name: kn
   workspaces:
     - name: shared-workspace
     - name: maven-settings
