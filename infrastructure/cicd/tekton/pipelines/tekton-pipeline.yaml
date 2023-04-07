@@ -262,12 +262,12 @@ spec:
             - create
             - $(params.quarkus-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name)@$(tasks.quarkus-image-build.results.IMAGE_DIGEST)'
-            # - '--revision-name={{.Service}}-{{.Generation}}'
-            # - '--namespace=sandbox'
-            - '--limit=cpu=100m,memory=128Mi'
+            - '--request cpu=200m,memory=128Mi'
+            - '--limit cpu=1000m,memory=1024Mi'
+            - '--scale 0..10'
             - --no-wait
             - --force
-            # - '--env=QUARKUS_PROFILE=dev'
+            # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
       runAfter:
         - quarkus-image-build
       taskRef:
@@ -284,9 +284,9 @@ spec:
             - create
             - $(params.micronaut-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name)@$(tasks.micronaut-image-build.results.IMAGE_DIGEST)'
-            # - '--revision-name={{.Service}}-{{.Generation}}'
-            # - '--namespace=sandbox'
-            - '--limit=cpu=100m,memory=128Mi'
+            - '--request cpu=200m,memory=128Mi'
+            - '--limit cpu=1000m,memory=1024Mi'
+            - '--scale 0..10'
             - --no-wait
             - --force
       runAfter:
@@ -305,9 +305,10 @@ spec:
             - create
             - $(params.springboot-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name)@$(tasks.springboot-image-build.results.IMAGE_DIGEST)'
-            # - '--revision-name={{.Service}}-{{.Generation}}'
-            # - '--namespace=sandbox'
-            - '--limit=cpu=100m,memory=128Mi'
+            - '--env spring_profiles_active=production'
+            - '--request cpu=200m,memory=128Mi'
+            - '--limit cpu=1000m,memory=1024Mi'
+            - '--scale 0..10'
             - --no-wait
             - --force
       runAfter:
