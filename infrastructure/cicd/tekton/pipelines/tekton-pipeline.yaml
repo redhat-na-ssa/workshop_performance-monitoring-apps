@@ -3,23 +3,6 @@ kind: Pipeline
 metadata:
   name: build-and-deploy-apps
 spec:
-  # finally:
-  #   - name: kustomize-deploy
-  #     params:
-  #       - name: kustomize-dir
-  #         value: $(params.context-dir)/$(params.kustomize-dir)
-  #       - name: target-namespace
-  #         value: $(params.target-namespace)
-  #       - name: image-name
-  #         value: $(params.image-name)
-  #       - name: image-digest-path
-  #         value: $(params.context-dir)/target
-      # taskRef:
-      #   kind: Task
-      #   name: kustomize
-      # workspaces:
-      #   - name: source
-      #     workspace: shared-workspace
   params:
     - default: 'https://github.com/redhat-na-ssa/workshop_performance-monitoring-apps.git'
       description: Git repo URL
@@ -38,7 +21,7 @@ spec:
       name: registry-url
       type: string
     - default: rh-summit-workshop
-      description: Repository name in your Container Registry
+      description: Repository name in your Container Registry (usually your username)
       name: registry-repo
       type: string
     - default: quarkus-app
@@ -53,13 +36,6 @@ spec:
       description: Springboot App Name (maven project context dir)
       name: springboot-app-name
       type: string
-
-    # - name: kustomize-dir
-    #   type: string
-    #   default: kustomize_ext/overlays/dev
-    #   description: 'Kustomize manifests dir'
-    # no need to pass registry creds using params if you have a proper SA and dockerconfig Secret 
-    #  setup to be used in your PipelineRuns (serviceAccount)
   tasks:
     - name: git-clone
       params:
@@ -262,9 +238,9 @@ spec:
             - create
             - $(params.quarkus-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name)@$(tasks.quarkus-image-build.results.IMAGE_DIGEST)'
-            - '--request cpu=200m,memory=128Mi'
-            - '--limit cpu=1000m,memory=1024Mi'
-            - '--scale 0..10'
+            - '--request=cpu=200m,memory=128Mi'
+            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--scale=0..10'
             - --no-wait
             - --force
             # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
@@ -284,9 +260,9 @@ spec:
             - create
             - $(params.micronaut-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name)@$(tasks.micronaut-image-build.results.IMAGE_DIGEST)'
-            - '--request cpu=200m,memory=128Mi'
-            - '--limit cpu=1000m,memory=1024Mi'
-            - '--scale 0..10'
+            - '--request=cpu=200m,memory=128Mi'
+            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--scale=0..10'
             - --no-wait
             - --force
       runAfter:
@@ -305,10 +281,10 @@ spec:
             - create
             - $(params.springboot-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name)@$(tasks.springboot-image-build.results.IMAGE_DIGEST)'
-            - '--env spring_profiles_active=production'
-            - '--request cpu=200m,memory=128Mi'
-            - '--limit cpu=1000m,memory=1024Mi'
-            - '--scale 0..10'
+            - '--env=spring_profiles_active=production'
+            - '--request=cpu=200m,memory=128Mi'
+            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--scale=0..10'
             - --no-wait
             - --force
       runAfter:
