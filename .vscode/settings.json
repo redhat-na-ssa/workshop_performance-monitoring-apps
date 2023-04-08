@@ -55,5 +55,12 @@
   ],
   "java.compile.nullAnalysis.mode": "disabled",
   "java.server.launchMode": "LightWeight",
-  "microprofile.tools.validation.enabled": false
+  "microprofile.tools.validation.enabled": false,
+  "yaml.schemas": {
+    "https://serverlessworkflow.io/schemas/0.8/workflow.json": [
+      "**/*.sw.yml",
+      "**/*.sw.yaml"
+    ],
+    "https://raw.githubusercontent.com/Hyperfoil/Hyperfoil/e18bfb186d30babc09e9fb110d284d1d16b84661/distribution/src/main/resources/schema.json": "/*.hf.yaml"
+  }
 }

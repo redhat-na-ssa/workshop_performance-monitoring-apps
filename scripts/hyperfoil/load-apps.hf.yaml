@@ -1,0 +1,118 @@
+name: summit-lab-load-apps
+http:
+# - host: https://quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+- host: http://quarkus-app:8080
+  sharedConnections: 10
+# - host: https://micronaut-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+- host: http://micronaut-app:8080
+  sharedConnections: 10
+# - host: https://springboot-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+- host: http://springboot-app:8080
+  sharedConnections: 10
+# usersPerSec: 10
+# duration: 1
+# scenario:
+# - app-endpoints:
+#   - httpRequest:
+#       # Authority is the combination of hostname and port.
+#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+#       GET: /quarkus
+#   - httpRequest:
+#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+#       GET: /quarkus/cpu?iterations=${CPU_ITERATIONS}
+#   - httpRequest:
+#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
+#       GET: /quarkus
+phases:
+- hello:
+    constantRate:
+      # 10 users will be starting the scenario every second (during 5s)
+      usersPerSec: 1
+      duration: 5s
+      scenario:
+      - fetchHello: #sequence
+        - httpRequest:
+            GET: /quarkus
+            authority: quarkus-app:8080
+        - httpRequest:
+            GET: /micronaut
+            authority: micronaut-app:8080
+        - httpRequest:
+            GET: /springboot
+            authority: springboot-app:8080
+
+- cpu:
+    constantRate:
+      usersPerSec: 1
+      duration: 5s
+      scenario:
+      - fetchCpu:
+        - set:
+            var: cpuIterations
+            value: !param CPU_ITERATIONS 10
+        - httpRequest:
+            GET: /quarkus/cpu?iterations=${cpuIterations}
+            authority: quarkus-app:8080
+        - httpRequest:
+            GET: /micronaut/cpu?iterations=${cpuIterations}
+            authority: micronaut-app:8080
+        - httpRequest:
+            GET: /springboot/cpu?iterations=${cpuIterations}
+            authority: springboot-app:8080
+
+- cpuWithPersistence:
+    constantRate:
+      usersPerSec: 1
+      duration: 5s
+      scenario:
+      - fetchCpu:
+        - set:
+            var: cpuIterations
+            value: !param CPU_ITERATIONS 10
+        - httpRequest:
+            GET: /quarkus/cpu?iterations=${cpuIterations}&db=true
+            authority: quarkus-app:8080
+        - httpRequest:
+            GET: /micronaut/cpu?iterations=${cpuIterations}&db=true
+            authority: micronaut-app:8080
+        - httpRequest:
+            GET: /springboot/cpu?iterations=${cpuIterations}&db=true
+            authority: springboot-app:8080
+
+- memory:
+    constantRate:
+      usersPerSec: 1
+      duration: 5s
+      scenario:
+      - allocateMem:
+        - set:
+            var: memoryBytes
+            value: !param MEMORY_BITES 10
+        - httpRequest:
+            GET: /quarkus/memory?bites=${memoryBytes}
+            authority: quarkus-app:8080
+        - httpRequest:
+            GET: /micronaut/memory?bites=${memoryBytes}
+            authority: micronaut-app:8080
+        - httpRequest:
+            GET: /springboot/memory?bites=${memoryBytes}
+            authority: springboot-app:8080
+
+- memoryWithPersistence:
+    constantRate:
+      usersPerSec: 1
+      duration: 5s
+      scenario:
+      - allocateMem:
+        - set:
+            var: memoryBytes
+            value: !param MEMORY_BITES 10
+        - httpRequest:
+            GET: /quarkus/memory?bites=${memoryBytes}&db=true
+            authority: quarkus-app:8080
+        - httpRequest:
+            GET: /micronaut/memory?bites=${memoryBytes}&db=true
+            authority: micronaut-app:8080
+        - httpRequest:
+            GET: /springboot/memory?bites=${memoryBytes}&db=true
+            authority: springboot-app:8080
