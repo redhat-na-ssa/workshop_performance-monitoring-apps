@@ -24,6 +24,10 @@ spec:
       description: Repository name in your Container Registry (usually your username)
       name: registry-repo
       type: string
+    - default: lab-sandbox
+      description: Namespace (project) where services will be deployed
+      name: target-namespace
+      type: string
     - default: quarkus-app
       description: Quarkus App Name (maven project context dir)
       name: quarkus-app-name
@@ -243,6 +247,7 @@ spec:
             - '--scale=0..10'
             - --no-wait
             - --force
+            - '--namespace=$(params.target-namespace)'
             # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
       runAfter:
         - quarkus-image-build
@@ -265,6 +270,7 @@ spec:
             - '--scale=0..10'
             - --no-wait
             - --force
+            - '--namespace=$(params.target-namespace)'
       runAfter:
         - micronaut-image-build
       taskRef:
@@ -287,6 +293,7 @@ spec:
             - '--scale=0..10'
             - --no-wait
             - --force
+            - '--namespace=$(params.target-namespace)'
       runAfter:
         - springboot-image-build
       taskRef:
