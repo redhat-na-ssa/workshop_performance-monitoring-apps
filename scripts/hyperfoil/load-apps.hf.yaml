@@ -1,34 +1,35 @@
 name: summit-lab-load-apps
 http:
 # - host: https://quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-- host: http://quarkus-app:8080
-  sharedConnections: 10
+# - host: http://springboot-app:8080
+- host: !param QUARKUS_APP_URL http://quarkus-app:8080
+  sharedConnections: !param SHARED_CONN 10 #evenly distributed among agents and threads.
 # - host: https://micronaut-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-- host: http://micronaut-app:8080
-  sharedConnections: 10
+# - host: http://springboot-app:8080
+- host: !param MICRONAUT_APP_URL http://micronaut-app:8080
+  sharedConnections: !param SHARED_CONN 10
 # - host: https://springboot-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-- host: http://springboot-app:8080
-  sharedConnections: 10
-# usersPerSec: 10
-# duration: 1
-# scenario:
-# - app-endpoints:
-#   - httpRequest:
-#       # Authority is the combination of hostname and port.
-#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-#       GET: /quarkus
-#   - httpRequest:
-#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-#       GET: /quarkus/cpu?iterations=${CPU_ITERATIONS}
-#   - httpRequest:
-#       authority: quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-#       GET: /quarkus
+# - host: http://springboot-app:8080
+- host: !param SPRINGBOOT_APP_URL http://springboot-app:8080
+  sharedConnections: !param SHARED_CONN 10
+# Distribute the connections among two agents
+# COMMENTS OUT IF RUNING LOCALLY ON STANDALONE MODE!
+# agents:
+#   agent-01:
+#     node: kubernetes.io/os=linux
+#   agent-02:
+#     node: kubernetes.io/os=linux
+
+#all phases are started independently at the same moment (when the benchmark was started)
 phases:
 - hello:
+    # The benchmark will start certain number of users according to a schedule 
+    # regardless of previously started users completing the scenario. 
+    # This is the open-model
     constantRate:
       # 10 users will be starting the scenario every second (during 5s)
-      usersPerSec: 1
-      duration: 5s
+      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
+      duration: !param PHASE_DURATION_SECS 5s
       scenario:
       - fetchHello: #sequence
         - httpRequest:
@@ -41,10 +42,14 @@ phases:
             GET: /springboot
             authority: springboot-app:8080
 
-- cpu:
-    constantRate:
-      usersPerSec: 1
-      duration: 5s
+- cpuRampUp:
+    increasingRate:
+      initialUsersPerSec: 1
+      targetUsersPerSec: !param USERS_PER_SEC 2 # run the scenario 'n' times per second in average
+      # We expect at most 200 users being active at one moment - see below
+      maxSessions: 200   
+      #usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
+      duration: !param PHASE_DURATION_SECS 5s
       scenario:
       - fetchCpu:
         - set:
@@ -62,8 +67,9 @@ phases:
 
 - cpuWithPersistence:
     constantRate:
-      usersPerSec: 1
-      duration: 5s
+      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
+      duration: !param PHASE_DURATION_SECS 5s
+      startAfter: cpuRampUp
       scenario:
       - fetchCpu:
         - set:
@@ -79,10 +85,14 @@ phases:
             GET: /springboot/cpu?iterations=${cpuIterations}&db=true
             authority: springboot-app:8080
 
-- memory:
-    constantRate:
-      usersPerSec: 1
-      duration: 5s
+- memoryRampUp:
+    increasingRate:
+      initialUsersPerSec: 1
+      targetUsersPerSec: !param USERS_PER_SEC 2 # run the scenario 'n' times per second in average
+      # We expect at most 200 users being active at one moment - see below
+      maxSessions: 200   
+      #usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
+      duration: !param PHASE_DURATION_SECS 5s
       scenario:
       - allocateMem:
         - set:
@@ -100,8 +110,9 @@ phases:
 
 - memoryWithPersistence:
     constantRate:
-      usersPerSec: 1
-      duration: 5s
+      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
+      duration: !param PHASE_DURATION_SECS 5s
+      startAfter: memoryRampUp
       scenario:
       - allocateMem:
         - set:

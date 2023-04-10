@@ -53,3 +53,4 @@ drop.sql
 .che/che-editor.ignore
 pg-conn-info.json
 .ignored
+scripts/hyperfoil/load-apps-scenarios.hf.yaml
