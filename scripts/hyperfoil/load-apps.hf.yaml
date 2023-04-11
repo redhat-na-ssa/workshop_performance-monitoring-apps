@@ -1,129 +1,206 @@
 name: summit-lab-load-apps
 http:
-# - host: https://quarkus-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-# - host: http://springboot-app:8080
 - host: !param QUARKUS_APP_URL http://quarkus-app:8080
-  sharedConnections: !param SHARED_CONN 10 #evenly distributed among agents and threads.
-# - host: https://micronaut-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-# - host: http://springboot-app:8080
+  name: quarkus-host
+  sharedConnections: !param SHARED_CONN 200 #evenly distributed among agents and threads.
 - host: !param MICRONAUT_APP_URL http://micronaut-app:8080
-  sharedConnections: !param SHARED_CONN 10
-# - host: https://springboot-app-sandbox.apps.cluster-hvsxt.hvsxt.sandbox891.opentlc.com
-# - host: http://springboot-app:8080
+  name: micronaut-host
+  sharedConnections: !param SHARED_CONN 200
 - host: !param SPRINGBOOT_APP_URL http://springboot-app:8080
-  sharedConnections: !param SHARED_CONN 10
+  name: springboot-host
+  sharedConnections: !param SHARED_CONN 200
+
+ergonomics: # Disable stopping the scenario on 4xx or 5xx response
+  autoRangeCheck: false
+  stopOnInvalid: false
+
 # Distribute the connections among two agents
 # COMMENTS OUT IF RUNING LOCALLY ON STANDALONE MODE!
 # agents:
-#   agent-01:
-#     node: kubernetes.io/os=linux
-#   agent-02:
-#     node: kubernetes.io/os=linux
+  agent-01:
+    node: kubernetes.io/os=linux
+    stop: true
+  agent-02:
+    node: kubernetes.io/os=linux
+    stop: true
+  agent-03:
+    node: kubernetes.io/os=linux
+    stop: true
+  # agent-04:
+  #   node: kubernetes.io/os=linux
+  # agent-05:
+  #   node: kubernetes.io/os=linux
 
 #all phases are started independently at the same moment (when the benchmark was started)
 phases:
-- hello:
+# This first phase will wake-up the services as they might be scaled to zero (serverless default behavior)
+# in JVM mode they may take between 3-8 secs due to the cold start effect
+- wakeUp:
     # The benchmark will start certain number of users according to a schedule 
     # regardless of previously started users completing the scenario. 
     # This is the open-model
-    constantRate:
-      # 10 users will be starting the scenario every second (during 5s)
-      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
-      duration: !param PHASE_DURATION_SECS 5s
+    atOnce:
+      users: 1 # run the scenario exactly once
+      duration: 0
       scenario:
-      - fetchHello: #sequence
+      - serviceWakeup: #sequence
         - httpRequest:
             GET: /quarkus
-            authority: quarkus-app:8080
+            endpoint: quarkus-host
+            sync: false
+            sla:
+              blockedRatio: 1
         - httpRequest:
             GET: /micronaut
-            authority: micronaut-app:8080
+            endpoint: micronaut-host
+            sync: false
+            sla:
+              blockedRatio: 1
         - httpRequest:
             GET: /springboot
-            authority: springboot-app:8080
+            endpoint: springboot-host
+            sync: false
+            sla:
+              blockedRatio: 1
+        # This step waits until responses for all sent requests are received and processed.
+        - awaitAllResponses
+
+- hello:
+    constantRate:
+      startAfterStrict: wakeUp # will wait until the wakeUp phase is TERMINATED (all requests done!)
+      # 10 users will be starting the scenario every second (during 120s)
+      usersPerSec: !param USERS_PER_SEC 10 # run the scenario 'n' times per second in average
+      maxSessions: 200
+      duration: !param 180s #let it run for about 3min...
+      # In Hyperfoil, everything is pre-allocated = limited in size. Here we'll
+      # set that we won't run more than LOOP (1 by default) iterations of this phase.
+      # maxIterations: !param LOOP 1
+      scenario:
+      - sayHello: #sequence
+        - httpRequest:
+            GET: /quarkus
+            endpoint: quarkus-host
+            sync: false
+        - httpRequest:
+            GET: /micronaut
+            endpoint: micronaut-host
+            sync: false
+        - httpRequest:
+            GET: /springboot
+            endpoint: springboot-host
+            sync: false
+        # Wait 3 seconds to simulate user-interaction
+        - thinkTime:
+            duration: 1s
 
 - cpuRampUp:
     increasingRate:
       initialUsersPerSec: 1
-      targetUsersPerSec: !param USERS_PER_SEC 2 # run the scenario 'n' times per second in average
-      # We expect at most 200 users being active at one moment - see below
-      maxSessions: 200   
-      #usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
-      duration: !param PHASE_DURATION_SECS 5s
+      targetUsersPerSec: !param USERS_PER_SEC 10
+      # We expect at most n users being active at one moment - see below
+      maxSessions: 100
+      duration: !param PHASE_DURATION_SECS 60s
+      #maxIterations: !param LOOP 1
+      startAfterStrict: 
+      - wakeUp
       scenario:
       - fetchCpu:
         - set:
             var: cpuIterations
-            value: !param CPU_ITERATIONS 10
+            value: !param CPU_ITERATIONS 5
         - httpRequest:
             GET: /quarkus/cpu?iterations=${cpuIterations}
-            authority: quarkus-app:8080
+            endpoint: quarkus-host
+            sync: false
         - httpRequest:
             GET: /micronaut/cpu?iterations=${cpuIterations}
-            authority: micronaut-app:8080
+            endpoint: micronaut-host
+            sync: false
         - httpRequest:
             GET: /springboot/cpu?iterations=${cpuIterations}
-            authority: springboot-app:8080
+            endpoint: springboot-host
+            sync: false
 
 - cpuWithPersistence:
-    constantRate:
-      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
-      duration: !param PHASE_DURATION_SECS 5s
-      startAfter: cpuRampUp
+    increasingRate:
+      initialUsersPerSec: 1
+      targetUsersPerSec: !param USERS_PER_SEC 10
+      maxSessions: 100
+      duration: !param PHASE_DURATION_SECS 60s
+      #maxIterations: !param LOOP 1
+      startAfterStrict: 
+      - wakeUp
+      - cpuRampUp
       scenario:
       - fetchCpu:
         - set:
             var: cpuIterations
-            value: !param CPU_ITERATIONS 10
+            value: !param CPU_ITERATIONS 5
         - httpRequest:
             GET: /quarkus/cpu?iterations=${cpuIterations}&db=true
-            authority: quarkus-app:8080
+            endpoint: quarkus-host
+            sync: false
         - httpRequest:
             GET: /micronaut/cpu?iterations=${cpuIterations}&db=true
-            authority: micronaut-app:8080
+            endpoint: micronaut-host
+            sync: false
         - httpRequest:
             GET: /springboot/cpu?iterations=${cpuIterations}&db=true
-            authority: springboot-app:8080
+            endpoint: springboot-host
+            sync: false
 
 - memoryRampUp:
     increasingRate:
       initialUsersPerSec: 1
-      targetUsersPerSec: !param USERS_PER_SEC 2 # run the scenario 'n' times per second in average
-      # We expect at most 200 users being active at one moment - see below
-      maxSessions: 200   
-      #usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
-      duration: !param PHASE_DURATION_SECS 5s
+      targetUsersPerSec: !param USERS_PER_SEC 10
+      maxSessions: 100   
+      duration: !param PHASE_DURATION_SECS 60s
+      #maxIterations: !param LOOP 1
+      startAfterStrict: 
+      - wakeUp
+      - cpuRampUp
       scenario:
       - allocateMem:
         - set:
             var: memoryBytes
-            value: !param MEMORY_BITES 10
+            value: !param MEMORY_BITES 20
         - httpRequest:
             GET: /quarkus/memory?bites=${memoryBytes}
-            authority: quarkus-app:8080
+            endpoint: quarkus-host
+            sync: false
         - httpRequest:
             GET: /micronaut/memory?bites=${memoryBytes}
-            authority: micronaut-app:8080
+            endpoint: micronaut-host
+            sync: false
         - httpRequest:
             GET: /springboot/memory?bites=${memoryBytes}
-            authority: springboot-app:8080
+            endpoint: springboot-host
+            sync: false
 
 - memoryWithPersistence:
-    constantRate:
-      usersPerSec: !param USERS_PER_SEC 1 # run the scenario 'n' times per second in average
-      duration: !param PHASE_DURATION_SECS 5s
-      startAfter: memoryRampUp
+    increasingRate:
+      initialUsersPerSec: 1
+      targetUsersPerSec: !param USERS_PER_SEC 10
+      maxSessions: 100
+      duration: !param PHASE_DURATION_SECS 60s
+      #maxIterations: !param LOOP 1
+      startAfterStrict: 
+      - wakeUp
+      - memoryRampUp
       scenario:
       - allocateMem:
         - set:
             var: memoryBytes
-            value: !param MEMORY_BITES 10
+            value: !param MEMORY_BITES 20
         - httpRequest:
             GET: /quarkus/memory?bites=${memoryBytes}&db=true
-            authority: quarkus-app:8080
+            endpoint: quarkus-host
+            sync: false
         - httpRequest:
             GET: /micronaut/memory?bites=${memoryBytes}&db=true
-            authority: micronaut-app:8080
+            endpoint: micronaut-host
+            sync: false
         - httpRequest:
             GET: /springboot/memory?bites=${memoryBytes}&db=true
-            authority: springboot-app:8080
+            endpoint: springboot-host
+            sync: false
