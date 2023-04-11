@@ -19,7 +19,6 @@
     <packaging>jar</packaging>
     <jdk.version>17</jdk.version>
     <release.version>17</release.version>
-    <!-- <micronaut.version>3.7.1</micronaut.version> -->
     <micronaut.version>3.8.8</micronaut.version>
     <micronaut.runtime>netty</micronaut.runtime>
     <exec.mainClass>io.containerapps.javaruntime.workshop.micronaut.MicronautApplication</exec.mainClass>
@@ -108,6 +107,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback.contrib</groupId>
+      <artifactId>logback-json-classic</artifactId>
+      <version>0.1.5</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
