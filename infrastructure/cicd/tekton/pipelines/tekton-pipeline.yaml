@@ -179,10 +179,10 @@ spec:
       params:
         - name: srcImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):$(tasks.git-clone.results.commit)
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):$(tasks.git-clone.results.commit)
         - name: destImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):latest
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):latest
       runAfter:
         - quarkus-image-build
       taskRef:
@@ -223,10 +223,10 @@ spec:
       params:
         - name: srcImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):$(tasks.git-clone.results.commit)
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):$(tasks.git-clone.results.commit)
         - name: destImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):latest
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):latest
       runAfter:
         - micronaut-image-build
       taskRef:
@@ -267,10 +267,10 @@ spec:
       params:
         - name: srcImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):$(tasks.git-clone.results.commit)
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):$(tasks.git-clone.results.commit)
         - name: destImageURL
           value: >-
-            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):latest
+            docker://$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):latest
       runAfter:
         - springboot-image-build
       taskRef:
