@@ -4,10 +4,19 @@ micronaut:
   server:
     port: 8702
     thread-selection: IO
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: true
+
 netty:
   default:
     allocator:
       max-order: 3
+
 datasources:
   default:
     dialect: H2
@@ -15,6 +24,7 @@ datasources:
     username: ${JDBC_USER:sa}
     password: ${JDBC_PASSWORD:""}
     driverClassName: ${JDBC_DRIVER:org.h2.Driver}
+
 jpa:
   default:
     entity-scan:
@@ -28,3 +38,7 @@ jpa:
         hbm2ddl:
           auto: update
         show_sql: true
+
+endpoints:
+  prometheus:
+    sensitive: false

@@ -4,10 +4,19 @@ micronaut:
   server:
     port: 8080
     thread-selection: IO
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: true
+
 netty:
   default:
     allocator:
       max-order: 3
+
 datasources:
   default:
     dialect: POSTGRES
@@ -15,6 +24,7 @@ datasources:
     username: ${JDBC_USER:postgres}
     password: ${JDBC_PASSWORD:password}
     driverClassName: org.postgresql.Driver
+
 jpa:
   default:
     entity-scan:
@@ -25,4 +35,8 @@ jpa:
           provider: none
         hbm2ddl:
           auto: none
-        show_sql: true
+        show_sql: false
+
+endpoints:
+  prometheus:
+    sensitive: false
