@@ -109,6 +109,11 @@
       <artifactId>logback-classic</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Enable Json Logging output
+     Json logging will be enabled by default in 'prod' environemnt.
+     To start micronaut with json logging pass `-Dlogback.configurationFile=logback-json.xml` 
+     as a JVM system property during initialization
+    -->
     <dependency>
       <groupId>ch.qos.logback.contrib</groupId>
       <artifactId>logback-json-classic</artifactId>

@@ -6,7 +6,7 @@
         <encoder>
             <pattern>%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
         </encoder>
-        <springProfile name="production,json">
+        <springProfile name="production,json-logging">
             <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
                 <jsonFormatter
                         class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
