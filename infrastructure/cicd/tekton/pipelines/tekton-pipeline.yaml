@@ -175,6 +175,22 @@ spec:
       workspaces:
         - name: source
           workspace: shared-workspace
+    - name: quarkus-image-tag
+      params:
+        - name: srcImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):$(tasks.git-clone.results.commit)
+        - name: destImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name):latest
+      runAfter:
+        - quarkus-image-build
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: image-urls-cm
     - name: micronaut-image-build
       params:
         - name: IMAGE
@@ -203,6 +219,22 @@ spec:
       workspaces:
         - name: source
           workspace: shared-workspace
+    - name: micronaut-image-tag
+      params:
+        - name: srcImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):$(tasks.git-clone.results.commit)
+        - name: destImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name):latest
+      runAfter:
+        - micronaut-image-build
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: image-urls-cm
     - name: springboot-image-build
       params:
         - name: IMAGE
@@ -231,6 +263,23 @@ spec:
       workspaces:
         - name: source
           workspace: shared-workspace
+    - name: springboot-image-tag
+      params:
+        - name: srcImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):$(tasks.git-clone.results.commit)
+        - name: destImageURL
+          value: >-
+            $(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name):latest
+      runAfter:
+        - springboot-image-build
+      taskRef:
+        kind: ClusterTask
+        name: skopeo-copy
+      workspaces:
+        - name: images-url
+          workspace: image-urls-cm
+  
     - name: deploy-quarkus-app
       params:
         - name: kn-image
@@ -243,14 +292,16 @@ spec:
             - $(params.quarkus-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.quarkus-app-name)@$(tasks.quarkus-image-build.results.IMAGE_DIGEST)'
             - '--request=cpu=200m,memory=128Mi'
-            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--limit=cpu=1000m,memory=1.5Gi'
+            - '--env=QUARKUS_LOG_CONSOLE_JSON=true'
+            # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
             - '--scale=0..10'
+            # - '--pull-policy=Always'
             - --no-wait
             - --force
             - '--namespace=$(params.target-namespace)'
-            # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
       runAfter:
-        - quarkus-image-build
+        - quarkus-image-tag
       taskRef:
         kind: ClusterTask
         name: kn
@@ -266,13 +317,15 @@ spec:
             - $(params.micronaut-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.micronaut-app-name)@$(tasks.micronaut-image-build.results.IMAGE_DIGEST)'
             - '--request=cpu=200m,memory=128Mi'
-            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--limit=cpu=1000m,memory=1.5Gi'
+            - '--env=JAVA_OPTS_APPEND=-Dlogback.configurationFile=logback-json.xml'
             - '--scale=0..10'
+            # - '--pull-policy=Always'
             - --no-wait
             - --force
             - '--namespace=$(params.target-namespace)'
       runAfter:
-        - micronaut-image-build
+        - micronaut-image-tag
       taskRef:
         kind: ClusterTask
         name: kn
@@ -287,18 +340,20 @@ spec:
             - create
             - $(params.springboot-app-name)
             - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.springboot-app-name)@$(tasks.springboot-image-build.results.IMAGE_DIGEST)'
-            - '--env=spring_profiles_active=production'
+            - '--env=spring_profiles_active=production,json-logging'
             - '--request=cpu=200m,memory=128Mi'
-            - '--limit=cpu=1000m,memory=1024Mi'
+            - '--limit=cpu=1000m,memory=1.5Gi'
             - '--scale=0..10'
+            # - '--pull-policy=Always'
             - --no-wait
             - --force
             - '--namespace=$(params.target-namespace)'
       runAfter:
-        - springboot-image-build
+        - springboot-image-tag
       taskRef:
         kind: ClusterTask
         name: kn
   workspaces:
     - name: shared-workspace
     - name: maven-settings
+    - name: image-urls-cm
