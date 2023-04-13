@@ -16,7 +16,7 @@ ergonomics: # Disable stopping the scenario on 4xx or 5xx response
 
 # Distribute the connections among two agents
 # COMMENTS OUT IF RUNING LOCALLY ON STANDALONE MODE!
-# agents:
+agents:
   agent-01:
     node: kubernetes.io/os=linux
     stop: true
@@ -27,9 +27,9 @@ ergonomics: # Disable stopping the scenario on 4xx or 5xx response
     node: kubernetes.io/os=linux
     stop: true
   # agent-04:
-  #   node: kubernetes.io/os=linux
+  #   node: node-role.kubernetes.io/control-plane=
   # agent-05:
-  #   node: kubernetes.io/os=linux
+  #   node: node-role.kubernetes.io/control-plane=
 
 #all phases are started independently at the same moment (when the benchmark was started)
 phases:
@@ -71,7 +71,7 @@ phases:
       # 10 users will be starting the scenario every second (during 120s)
       usersPerSec: !param USERS_PER_SEC 10 # run the scenario 'n' times per second in average
       maxSessions: 200
-      duration: !param 180s #let it run for about 3min...
+      duration: 180s #let it run for about 3min...
       # In Hyperfoil, everything is pre-allocated = limited in size. Here we'll
       # set that we won't run more than LOOP (1 by default) iterations of this phase.
       # maxIterations: !param LOOP 1
