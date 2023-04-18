@@ -61,7 +61,7 @@ components:
 ### volumes
   - name: m2
     volume:
-      size: 1G
+      size: 3G
 commands:
 ### Quarkus inner-loop commands
   - id: quarkus-package-jvm
@@ -192,9 +192,12 @@ commands:
     exec:
       label: Switch to Java 17
       component: "tools"
+      # workingDir: '${PROJECT_SOURCE}'
       commandLine: |
         [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
         sdk default java 17.0.3-tem
+        #copy maven settings pointing to in-cluster nexus mirror
+        [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
       # use this block when using the product UDI
       # commandLine: |
       #   echo "" >> /home/user/.bashrc
