@@ -6,7 +6,7 @@
         <encoder>
             <pattern>%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
         </encoder>
-        <springProfile name="production,json-logging">
+        <!-- <springProfile name="production,json-logging">
             <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
                 <jsonFormatter
                         class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
@@ -14,7 +14,7 @@
                 </jsonFormatter>
                 <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
             </layout>
-        </springProfile>
+        </springProfile> -->
         <!-- <withJansi>true</withJansi> -->
     </appender>
 
