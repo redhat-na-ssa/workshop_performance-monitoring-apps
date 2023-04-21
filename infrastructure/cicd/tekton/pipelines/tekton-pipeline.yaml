@@ -12,15 +12,15 @@ spec:
       description: 'branch, tag, revision'
       name: git-revision
       type: string
-    - default: .
-      description: Git Repo sub directory
+    - default: code-repo
+      description: sub-directory where the repo will be cloned into
       name: context-dir
       type: string
     - default: quay.io
       description: Container Registry URL
       name: registry-url
       type: string
-    - default: rh-summit-workshop-CHANGE-ME
+    - default: CHANGE-ME
       description: Repository name in your Container Registry (usually your username)
       name: registry-repo
       type: string
@@ -304,6 +304,8 @@ spec:
             - '--request=cpu=200m,memory=128Mi'
             - '--limit=cpu=1000m,memory=1.5Gi'
             - '--env=QUARKUS_LOG_CONSOLE_JSON=true'
+            - '--env=JAVA_MAX_MEM_RATIO=85.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=50'
             # - '--env=QUARKUS_PROFILE=prod' #defaults to prod
             - '--scale=0..10'
             # - '--pull-policy=Always'
@@ -329,6 +331,8 @@ spec:
             - '--request=cpu=200m,memory=128Mi'
             - '--limit=cpu=1000m,memory=1.5Gi'
             - '--env=JAVA_OPTS_APPEND=-Dlogback.configurationFile=logback-json.xml'
+            - '--env=JAVA_MAX_MEM_RATIO=85.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=50'
             - '--scale=0..10'
             # - '--pull-policy=Always'
             - --no-wait
@@ -353,6 +357,8 @@ spec:
             - '--env=spring_profiles_active=production,json-logging'
             - '--request=cpu=200m,memory=128Mi'
             - '--limit=cpu=1000m,memory=1.5Gi'
+            - '--env=JAVA_MAX_MEM_RATIO=85.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=50'
             - '--scale=0..10'
             # - '--pull-policy=Always'
             - --no-wait

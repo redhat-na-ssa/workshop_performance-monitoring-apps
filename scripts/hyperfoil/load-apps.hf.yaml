@@ -1,12 +1,12 @@
 name: summit-lab-load-apps
 http:
-- host: !param QUARKUS_APP_URL http://quarkus-app:8080
+- host: !param QUARKUS_APP_URL #http://quarkus-app:8080
   name: quarkus-host
   sharedConnections: !param SHARED_CONN 200 #evenly distributed among agents and threads.
-- host: !param MICRONAUT_APP_URL http://micronaut-app:8080
+- host: !param MICRONAUT_APP_URL #http://micronaut-app:8080
   name: micronaut-host
   sharedConnections: !param SHARED_CONN 200
-- host: !param SPRINGBOOT_APP_URL http://springboot-app:8080
+- host: !param SPRINGBOOT_APP_URL #http://springboot-app:8080
   name: springboot-host
   sharedConnections: !param SHARED_CONN 200
 
