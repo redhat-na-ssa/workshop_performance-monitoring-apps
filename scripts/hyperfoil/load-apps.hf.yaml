@@ -19,12 +19,15 @@ ergonomics: # Disable stopping the scenario on 4xx or 5xx response
 agents:
   agent-01:
     node: kubernetes.io/os=linux
+    extras: "-Dio.hyperfoil.jitter.watchdog.threshold=300" #-XX:MaxRAMPercentage=80.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=50 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
     stop: true
   agent-02:
     node: kubernetes.io/os=linux
+    extras: "-Dio.hyperfoil.jitter.watchdog.threshold=300"
     stop: true
   agent-03:
     node: kubernetes.io/os=linux
+    extras: "-Dio.hyperfoil.jitter.watchdog.threshold=300"
     stop: true
   # agent-04:
   #   node: node-role.kubernetes.io/control-plane=
@@ -41,27 +44,39 @@ phases:
     # This is the open-model
     atOnce:
       users: 1 # run the scenario exactly once
-      duration: 0
+      # duration: 15s
       scenario:
       - serviceWakeup: #sequence
         - httpRequest:
             GET: /quarkus
             endpoint: quarkus-host
             sync: false
+            timeout: 60s
             sla:
-              blockedRatio: 1
+              blockedRatio: 1.0
+              errorRatio: 3.0
+              invalidRatio: 1.0
+              meanResponseTime: 50s
         - httpRequest:
             GET: /micronaut
             endpoint: micronaut-host
             sync: false
+            timeout: 60s            
             sla:
-              blockedRatio: 1
+              blockedRatio: 1.0
+              errorRatio: 3.0
+              invalidRatio: 1.0
+              meanResponseTime: 50s
         - httpRequest:
             GET: /springboot
             endpoint: springboot-host
             sync: false
+            timeout: 60s
             sla:
-              blockedRatio: 1
+              blockedRatio: 1.0
+              errorRatio: 3.0
+              invalidRatio: 1.0
+              meanResponseTime: 50s
         # This step waits until responses for all sent requests are received and processed.
         - awaitAllResponses
 
