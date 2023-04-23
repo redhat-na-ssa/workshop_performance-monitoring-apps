@@ -54,10 +54,12 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-h2</artifactId>
     </dependency>
+    <!-- to enable- Service Binding (requires The SBO installed in the cluster)
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-kubernetes-service-binding</artifactId>
-    </dependency>
+    </dependency> 
+    -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-openshift</artifactId>

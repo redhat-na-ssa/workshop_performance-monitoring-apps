@@ -59,13 +59,13 @@ then
 #       uri: .data.uri | @base64d
 #       }' > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
 
-  oc get secret $POSTGRES_INSTANCE_NAME-pguser-$POSTGRES_INSTANCE_NAME -o json | jq '{ 
+  oc get secret $POSTGRES_INSTANCE_NAME-pguser-$POSTGRES_INSTANCE_NAME -o json | jq "{ 
       user: .data.user | @base64d, 
       password: .data.password | @base64d, 
-      host: '"${POSTGRES_INSTANCE_NAME}-ha"', 
+      host: \"$POSTGRES_INSTANCE_NAME-ha\",
       dbname: .data.dbname | @base64d, 
-      uri: '"jdbc:postgresql://${POSTGRES_INSTANCE_NAME}-ha/postgres"'
-      }' > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
+      uri:  \"jdbc:postgresql://$POSTGRES_INSTANCE_NAME-ha/postgres\" 
+      }" > ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
 
   cat ${PROJECT_SOURCE:-$(pwd)}/pg-conn-info.json
    # sample output
