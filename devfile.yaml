@@ -43,21 +43,9 @@ components:
           path: /home/user/.m2
       memoryLimit: 6Gi
       memoryRequest: 2Gi
-      cpuRequest: 1000m
-      cpuLimit: 4000m
+      cpuRequest: '1'
+      cpuLimit: '3'
       mountSources: true
-# Utility Containers
-  - name: ubi-minimal
-    container:
-      args:
-        - '-f'
-        - /dev/null
-      command:
-        - tail
-      image: registry.access.redhat.com/ubi8/ubi-minimal
-      memoryLimit: 64M
-      mountSources: true
-      sourceMapping: /projects
 ### volumes
   - name: m2
     volume:
@@ -156,7 +144,7 @@ commands:
   - id: sb-start-dev
     exec:
       label: SpringBoot - Start in dev mode
-      commandLine: './mvnw compile spring-boot:run -Dspring.profiles.active=dev'
+      commandLine: './mvnw compile spring-boot:run -Dspring.profiles.active=development'
       component: tools
       group:
         isDefault: true
