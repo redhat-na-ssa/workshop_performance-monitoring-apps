@@ -138,7 +138,8 @@ spec:
       workspaces:
         - name: images-url
           workspace: image-urls-cm
-    - name: deploy-app
+
+    - name: deploy-quarkus
       params:
         - name: kn-image
           value: >-
@@ -152,7 +153,7 @@ spec:
             - '--probe-liveness=http:::/q/health/live'
             - '--probe-liveness-opts=initialDelaySeconds=3,periodSeconds=30,failureThreshold=5,successThreshold=1,timeoutSeconds=10'
             - '--probe-readiness=http:::/q/health/ready'
-            - '--probe-readiness-opts=initialDelaySeconds=3,periodSeconds=10,failureThreshold=5,successThreshold=1,timeoutSeconds=10'
+            - '--probe-readiness-opts=initialDelaySeconds=3,periodSeconds=10,failureThreshold=5,successThreshold=1,timeoutSeconds=10' 
             - '--request=cpu=200m,memory=128Mi'
             - '--limit=cpu=2,memory=1.5Gi'
             - '--env=JAVA_MAX_MEM_RATIO=75.0'
@@ -161,11 +162,82 @@ spec:
             - --no-wait
             - --force
             - '--namespace=$(params.target-namespace)'
-      runAfter:
-        - image-tag
       taskRef:
         kind: ClusterTask
         name: kn
+      runAfter:
+        - image-tag
+      when:
+        - input: "$(params.app-name)"
+          operator: in
+          values: ["quarkus-app"]
+
+    - name: deploy-micronaut
+      params:
+        - name: kn-image
+          value: >-
+            gcr.io/knative-releases/knative.dev/client/cmd/kn@sha256:ca767fde54bd76caf5654bc60a8447784f0989676b92ca8ff338f6bf8f00e2b6
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.app-name)@$(tasks.image-build.results.IMAGE_DIGEST)'
+            - '--probe-liveness=http:::/health'
+            - '--probe-liveness-opts=initialDelaySeconds=3,periodSeconds=30,failureThreshold=5,successThreshold=1,timeoutSeconds=10'
+            - '--probe-readiness=http:::/health'
+            - '--probe-readiness-opts=initialDelaySeconds=3,periodSeconds=10,failureThreshold=5,successThreshold=1,timeoutSeconds=10' 
+            - '--request=cpu=200m,memory=128Mi'
+            - '--limit=cpu=2,memory=1.5Gi'
+            - '--env=JAVA_MAX_MEM_RATIO=75.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=25'
+            - '--scale=0..3'
+            - --no-wait
+            - --force
+            - '--namespace=$(params.target-namespace)'
+      taskRef:
+        kind: ClusterTask
+        name: kn
+      runAfter:
+        - image-tag
+      when:
+        - input: "$(params.app-name)"
+          operator: in
+          values: ["micronaut-app"]
+
+    - name: deploy-springboot
+      params:
+        - name: kn-image
+          value: >-
+            gcr.io/knative-releases/knative.dev/client/cmd/kn@sha256:ca767fde54bd76caf5654bc60a8447784f0989676b92ca8ff338f6bf8f00e2b6
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.app-name)@$(tasks.image-build.results.IMAGE_DIGEST)'
+            - '--probe-liveness=http:::/actuator/health/liveness'
+            - '--probe-liveness-opts=initialDelaySeconds=5,periodSeconds=30,failureThreshold=5,successThreshold=1,timeoutSeconds=10'
+            - '--probe-readiness=http:::/actuator/health/readiness'
+            - '--probe-readiness-opts=initialDelaySeconds=5,periodSeconds=10,failureThreshold=5,successThreshold=1,timeoutSeconds=10' 
+            - '--request=cpu=200m,memory=128Mi'
+            - '--limit=cpu=2,memory=1.5Gi'
+            - '--env=JAVA_MAX_MEM_RATIO=75.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=25'
+            - '--scale=0..3'
+            - --no-wait
+            - --force
+            - '--namespace=$(params.target-namespace)'
+      taskRef:
+        kind: ClusterTask
+        name: kn
+      runAfter:
+        - image-tag
+      when:
+        - input: "$(params.app-name)"
+          operator: in
+          values: ["springboot-app"]
+
   workspaces:
     - name: shared-workspace
     - name: maven-settings
