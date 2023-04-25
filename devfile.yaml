@@ -23,21 +23,28 @@ components:
 ### Workspace Tools Container
   - name: tools
     container:
-      image: quay.io/devfile/universal-developer-image@sha256:80fdd1ae37d3b9e0260d9c66b4ff12e35317c31243eabeea5212d98c537a3ba9 # upstream - 3.7GB compressed
+      image: quay.io/redhat_na_ssa/universal-developer-image:ubi8-latest # our fork - 2.0GB compressed
+      # image: quay.io/devfile/universal-developer-image@sha256:80fdd1ae37d3b9e0260d9c66b4ff12e35317c31243eabeea5212d98c537a3ba9 # upstream - 3.7GB compressed
       # image: registry.redhat.io/devspaces/udi-rhel8:latest #1.7GB compressed
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
       endpoints:
-        - exposure: none
-          name: debug
-          protocol: tcp
-          targetPort: 5005
         - exposure: public
-          name: home
+          name: quarkus-app
           protocol: http
-          targetPort: 8080
-          path: /
+          targetPort: 8701
+          path: /quarkus
+        - exposure: public
+          name: micronaut-app
+          protocol: http
+          targetPort: 8702
+          path: /micronaut
+        - exposure: public
+          name: springboot-app
+          protocol: http
+          targetPort: 8703
+          path: /springboot
       volumeMounts:
         - name: m2
           path: /home/user/.m2
@@ -160,6 +167,42 @@ commands:
         kind: run
       workingDir: '${PROJECT_SOURCE}/springboot-app/'
 ### Common commands
+  - id: show-app-routes
+    exec:
+      label: Show Hyperfoil and Apps Routes
+      component: "tools"
+      commandLine: |
+        oc get route hyperfoil-instance --ignore-not-found=true -n "$(oc whoami)-hyperfoil" \
+         -o jsonpath="{'\n\nHYPERFOIL_CONTROLLER_URL: '}{'https://'}{.status.ingress[0].host}{'\n'}"
+        oc get rt quarkus-app --ignore-not-found=true -n "$(oc whoami)-staging" \
+         -o jsonpath="{'\nQUARKUS_APP_URL: '}{.status.address.url}{'\n'}{'APP_CONTEXT_PATH: /quarkus \n\n'}"
+        oc get rt micronaut-app --ignore-not-found=true -n "$(oc whoami)-staging" \
+         -o jsonpath="{'\nMICRONAUT_APP_URL: '}{.status.address.url}{'\n'}{'APP_CONTEXT_PATH: /micronaut \n\n'}"
+        oc get rt springboot-app --ignore-not-found=true -n "$(oc whoami)-staging" \
+         -o jsonpath="{'\nSPRINGBOOT_APP_URL: '}{.status.address.url}{'\n'}{'APP_CONTEXT_PATH: /springboot \n\n'}"
+
+  - id: enable-cpu-auto-scaling
+    exec:
+      label: Enable CPU based auto-scaling
+      component: "tools"
+      commandLine: |
+        read -e -p "App Name: [quakus-app | micronaut-app | springboot-app ] " app
+        kn service update ${app:-quarkus-app} -n "$(oc whoami)-staging \
+         --annotation autoscaling.knative.dev/class=hpa.autoscaling.knative.dev \
+         --scale-metric cpu \
+         --scale-target=15
+
+  - id: enable-memory-auto-scaling
+    exec:
+      label: Enable Memory based auto-scaling
+      component: "tools"
+      commandLine: |
+        read -e -p "App Name: [quakus-app | micronaut-app | springboot-app ] " app
+        kn service update ${app:-quarkus-app} -n "$(oc whoami)-staging \
+         --annotation autoscaling.knative.dev/class=hpa.autoscaling.knative.dev \
+         --scale-metric memory \
+         --scale-target=300
+
   # - id: deploy-postgresql
   #   exec:
   #     label: Deploy a PostgreSQL instance
