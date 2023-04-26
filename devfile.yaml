@@ -1,25 +1,7 @@
 schemaVersion: 2.2.0
 metadata:
   name: workshop-performance-monitoring-apps
-# projects:
-#   - name: workshop-performance-monitoring-apps
-    # git:
-    #   remotes:
-    #     origin: "https://github.com/redhat-na-ssa/workshop_performance-monitoring-apps.git"
-    #   checkoutFrom:
-    #     revision: main
 components:
-### kubernetes/openshift resources
-  # - name: innerloop-postgres-deploy
-  #   openshift:
-  #     # uri: ./infrastructure/postgres-deployment.yaml # not working on DevSpaces 3.5.0!!!
-  #     deployByDefault: false
-  #     endpoints:
-  #       - exposure: public
-  #         name: postgres
-  #         protocol: tcp
-  #         targetPort: 5432
-  #     inlined: |
 ### Workspace Tools Container
   - name: tools
     container:
@@ -58,7 +40,7 @@ components:
     volume:
       size: 3G
 commands:
-### Quarkus inner-loop commands
+  ### Quarkus inner-loop commands
   - id: quarkus-package-jvm
     exec:
       label: '01: Quarkus - JVM Package'
@@ -77,14 +59,6 @@ commands:
         isDefault: true
         kind: build
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
-  # - id: quarkus-package-native
-  #   exec:
-  #     label: Quarkus - Native Package
-  #     commandLine: './mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=6G'
-  #     component: tools
-  #     group:
-  #       kind: build
-  #     workingDir: '${PROJECT_SOURCE}/quarkus-app/'
   - id: quarkus-start-dev
     exec:
       label: '03: Quarkus - Start in dev mode (Hot reload + debug)'
@@ -94,23 +68,7 @@ commands:
         isDefault: true
         kind: run
       workingDir: '${PROJECT_SOURCE}/quarkus-app/'
-  # - id: quarkus-start-native
-  #   exec:
-  #     label: Quarkus - Start in native
-  #     commandLine: ./quarkus-app-1.0.0-SNAPSHOT-runner
-  #     component: ubi-minimal
-  #     group:
-  #       kind: run
-  #     workingDir: '${PROJECT_SOURCE}/quarkus-app/target'
-  # - id: quarkus-deploy-on-openshift
-  #   exec:
-  #     label: Quarkus - Build and Deploy on Openshift
-  #     commandLine: 'oc project ${DEVWORKSPACE_NAMESPACE}; ./mvnw clean package -DskipTests -Dquarkus.kubernetes.deploy=true -Dquarkus.container-image.builder=openshift'
-  #     component: tools
-  #     group:
-  #       kind: run
-  #     workingDir: '${PROJECT_SOURCE}/quarkus-app/'
-### Micronaut inner-loop commands
+  ### Micronaut inner-loop commands
   - id: mn-package-jvm
     exec:
       label: '04: Micronaut - JVM Package'
@@ -138,7 +96,7 @@ commands:
         isDefault: true
         kind: run
       workingDir: '${PROJECT_SOURCE}/micronaut-app/'
-### SpringBoot inner-loop commands
+  ### SpringBoot inner-loop commands
   - id: sb-package-jvm
     exec:
       label: '07: SpringBoot - JVM Package'
@@ -166,7 +124,7 @@ commands:
         isDefault: true
         kind: run
       workingDir: '${PROJECT_SOURCE}/springboot-app/'
-### Common commands
+  ### Common commands
   - id: show-app-routes
     exec:
       label: '10: Show Hyperfoil and Apps Routes'
@@ -215,7 +173,7 @@ commands:
         read -e -p "Make sure you have your registry token inside the '' ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml '' file (hit enter to proceed!)" ok
         echo
         echo "current content of your secret file:"
-        bat ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml
+        cat ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml
 
         oc apply -f ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml -n "$(oc whoami)-cicd"
         oc apply -f ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml -n "$(oc whoami)-staging"
@@ -243,22 +201,6 @@ commands:
         oc login -u $(echo $DEVWORKSPACE_NAMESPACE | cut -d'-' -f 1) $KUBERNETES_PORT --insecure-skip-tls-verify=true
         oc project $DEVWORKSPACE_NAMESPACE
 
-  # - id: deploy-postgresql
-  #   exec:
-  #     label: Deploy a PostgreSQL instance
-  #     commandLine: '${PROJECT_SOURCE}/infrastructure/deploy_pg_using_operator.sh'
-  #     component: tools
-  #     group:
-  #       kind: run
-  #     workingDir: '${PROJECT_SOURCE}'
-### Pre-hooks
-  # - id: switch-to-java-11
-  #   exec:
-  #     label: Switch to Java 11
-  #     component: "tools"
-  #     commandLine: |
-  #       [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-  #       sdk default java 11.0.15-tem
   - id: switch-to-java-17
     exec:
       label: '99: Switch to Java 17'
@@ -269,23 +211,6 @@ commands:
         sdk default java 17.0.7-tem
         #copy maven settings pointing to in-cluster nexus mirror
         [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
-      # use this block when using the product UDI
-      # commandLine: |
-      #   echo "" >> /home/user/.bashrc
-      #   echo "#added during devfile postStart event processing..." >> /home/user/.bashrc
-      #   echo "export JAVA_HOME=$JAVA_HOME_17" >> /home/user/.bashrc
-      #   echo "export PATH=$JAVA_HOME_17/bin:$PATH" >> /home/user/.bashrc
-  # - id: config-git-store
-  #   exec:
-  #     label: Create git credential store
-  #     component: "tools"
-  #     commandLine: |
-  #       git config --global credential.helper store
-  # - id: pre-hooks
-  #   composite:
-  #     commands:
-  #       - switch-to-java-17
-  #       - config-git-store
 events:
   postStart:
     - switch-to-java-17 # <== Start of the workspace happens after this command is completed
