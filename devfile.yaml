@@ -88,7 +88,7 @@ commands:
   - id: quarkus-start-dev
     exec:
       label: Quarkus - Start in dev mode (Hot reload + debug)
-      commandLine: './mvnw compile quarkus:dev -Dquarkus.container-image.build=false -Dquarkus.container-image.builder=openshift'
+      commandLine: './mvnw compile quarkus:dev -DskipTests -Dquarkus.container-image.build=false -Dquarkus.container-image.builder=openshift'
       component: tools
       group:
         isDefault: true
@@ -226,7 +226,7 @@ commands:
       # workingDir: '${PROJECT_SOURCE}'
       commandLine: |
         [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-        sdk default java 17.0.3-tem
+        sdk default java 17.0.7-tem
         #copy maven settings pointing to in-cluster nexus mirror
         [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
       # use this block when using the product UDI
