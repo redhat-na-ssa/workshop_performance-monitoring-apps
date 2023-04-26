@@ -44,9 +44,9 @@ phases:
             timeout: 60s
             sla:
               blockedRatio: 1.0
-              errorRatio: 3.0
+              errorRatio: 1.0
               invalidRatio: 1.0
-              meanResponseTime: 50s
+              meanResponseTime: 30s
 
         # This step waits until responses for all sent requests are received and processed.
         - awaitAllResponses

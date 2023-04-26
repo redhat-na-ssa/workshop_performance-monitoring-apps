@@ -13,7 +13,6 @@ kn service create quarkus-app \
  --limit=cpu=2,memory=1.5Gi \
  --env=JAVA_MAX_MEM_RATIO=75.0 \
  --env=GC_MAX_HEAP_FREE_RATIO=25 \
- --env=QUARKUS_LOG_CONSOLE_JSON=false \
  --label=app.openshift.io/runtime=quarkus \
  --scale=0..3 \
  --no-wait \
@@ -51,9 +50,9 @@ kn service create quarkus-app \
  --probe-readiness-opts='initialDelaySeconds=7,periodSeconds=30,failureThreshold=3,successThreshold=1,timeoutSeconds=10' \
  --request=cpu=200m,memory=128Mi \
  --limit=cpu=2,memory=1.5Gi \
- --env=spring_profiles_active=production \
  --env=JAVA_MAX_MEM_RATIO=75.0 \
  --env=GC_MAX_HEAP_FREE_RATIO=25 \
+ --env=SPRING_PROFILES_ACTIVE=production \
  --label=app.openshift.io/runtime=spring-boot \
  --scale=0..3 \
  --no-wait \

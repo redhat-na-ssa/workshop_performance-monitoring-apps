@@ -16,16 +16,11 @@ spec:
     - name: registry-url
       value: quay.io
     - name: registry-repo
-      value: rafaeltuelho
+      value: CHANGE-ME
     - name: target-namespace
-      value: user1-staging
-    - name: quarkus-app-name
-      value: quarkus-app
-    - name: micronaut-app-name
-      value: micronaut-app
-    - name: springboot-app-name
-      value: springboot-app
-    - name: maven-mirror-url
+      value: CHANGE-ME
+    - name: app-name
+      value: CHANGE-ME
       value: >-
         http://nexus-sonatype-nexus-service.shared-maven-mirror.svc.cluster.local:8081/repository/maven-public
   pipelineRef:
