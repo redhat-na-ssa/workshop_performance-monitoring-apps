@@ -39,7 +39,7 @@ phases:
       - serviceWakeup: #sequence
         - httpRequest:
             GET: !param APP_CONTEXT_PATH
-            endpoint: quarkus-host
+            endpoint: app-host
             sync: false
             timeout: 60s
             sla:
