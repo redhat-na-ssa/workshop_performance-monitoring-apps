@@ -130,6 +130,7 @@ commands:
       label: '10: Show Hyperfoil and Apps Routes'
       component: "tools"
       commandLine: |
+        clear
         echo
         oc get route hyperfoil-instance --ignore-not-found=true -n "$(oc whoami)-hyperfoil" \
          -o jsonpath="{'\n\nHYPERFOIL_CONTROLLER_URL: '}{'https://'}{.status.ingress[0].host}{'\n'}"
@@ -145,6 +146,7 @@ commands:
       label: '11: Enable CPU based auto-scaling'
       component: "tools"
       commandLine: |
+        clear
         echo
         read -e -p "App Name: [quakus-app | micronaut-app | springboot-app ] " app
         kn service update ${app:-quarkus-app} -n "$(oc whoami)-staging" \
@@ -169,8 +171,9 @@ commands:
       label: '13: Create Registry Push Secret'
       component: "tools"
       commandLine: |
+        clear
         echo
-        read -e -p "Make sure you have your registry token inside the '' ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml '' file (hit enter to proceed!)" ok
+        read -e -p $"Make sure you have your registry token inside the \n'${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml' file \nhit enter to proceed." ok
         echo
         echo "current content of your secret file:"
         cat ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml
@@ -185,15 +188,24 @@ commands:
       label: '14: Open Hyperfoil Web CLI'
       component: "tools"
       commandLine: |
+        clear
         hfurl=$(oc get route hyperfoil-instance --ignore-not-found=true -n "$(oc whoami)-hyperfoil" -o jsonpath="{'https://'}{.status.ingress[0].host}")
         echo "opening $hfurl in your browser..."
-        python -m webbrowser "$hfurl"
+        
+        python -m webbrowser $hfurl
+        echo
+        echo "please, use this URL: "
+        echo
+        echo -e "\thttps://raw.githubusercontent.com/redhat-na-ssa/workshop_performance-monitoring-apps-template/b4a349bdd424e49d3e8265dfdc3caf77c4023381/scripts/hyperfoil/summit-load-apps.hf.yaml"
+        echo
+        echo "to upload the benchmark definition in the Hyperfoil web-cli."
 
   - id: oc-login
     exec:
       label: '98: OC Login'
       component: "tools"
       commandLine: |
+        clear
         echo
         echo "current user: $(oc whoami)"
         echo "current project: $(oc project)"
