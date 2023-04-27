@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+
+  ],
+  "inputs": [
+    {
+      "id": "openSimpleBrowser",
+      "type": "command",
+      "command": "simpleBrowser.show",
+      "args": [HYPERFOIL_URL]
+    }
+  ]
+}

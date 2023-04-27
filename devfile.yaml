@@ -183,16 +183,14 @@ commands:
         oc secrets link pipeline quay-push-secret --for=pull,mount -n "$(oc whoami)-cicd"
         oc secrets link default quay-push-secret --for=pull,mount -n "$(oc whoami)-staging"
 
-  - id: open-hyperfoil-web-cli
+  - id: open-hyperfoil-web-cli-simple-browser
     exec:
       label: '14: Open Hyperfoil Web CLI'
       component: "tools"
       commandLine: |
-        clear
-        hfurl=$(oc get route hyperfoil-instance --ignore-not-found=true -n "$(oc whoami)-hyperfoil" -o jsonpath="{'https://'}{.status.ingress[0].host}")
-        echo "opening $hfurl in your browser..."
-        
-        python -m webbrowser $hfurl
+        export HYPERFOIL_URL=$(oc get route hyperfoil-instance --ignore-not-found=true -n "$(oc whoami)-hyperfoil" -o jsonpath="{'https://'}{.status.ingress[0].host}")
+        sed -i -e "s|HYPERFOIL_URL|\"$HYPERFOIL_URL\"|" ${PROJECT_SOURCE}/.vscode/tasks.json
+        ${input:openSimpleBrowser}
         echo
         echo "please, use this URL: "
         echo
@@ -210,7 +208,7 @@ commands:
         echo "current user: $(oc whoami)"
         echo "current project: $(oc project)"
         echo
-        oc login -u $(echo $DEVWORKSPACE_NAMESPACE | cut -d'-' -f 1) $KUBERNETES_PORT --insecure-skip-tls-verify=true
+        oc login -u $(echo $DEVWORKSPACE_NAMESPACE | cut -d'-' -f 1) "https://$KUBERNETES_SERVICE_HOST:443" --insecure-skip-tls-verify=true
         oc project $DEVWORKSPACE_NAMESPACE
 
   - id: switch-to-java-17
