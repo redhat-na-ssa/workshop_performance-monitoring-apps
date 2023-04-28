@@ -146,25 +146,14 @@ commands:
       label: '11: Enable CPU based auto-scaling'
       component: "tools"
       commandLine: |
-        clear
-        echo
-        read -e -p "App Name: [quakus-app | micronaut-app | springboot-app ] " app
-        kn service update ${app:-quarkus-app} -n "$(oc whoami)-staging" \
-         --annotation autoscaling.knative.dev/class=hpa.autoscaling.knative.dev \
-         --scale-metric cpu \
-         --scale-target=15
+        ${PROJECT_SOURCE}/scripts/enable-auto-scaling.sh cpu 20
 
   - id: enable-memory-auto-scaling
     exec:
       label: '12: Enable Memory based auto-scaling'
       component: "tools"
       commandLine: |
-        echo
-        read -e -p "App Name: [quakus-app | micronaut-app | springboot-app ] " app
-        kn service update ${app:-quarkus-app} -n "$(oc whoami)-staging" \
-         --annotation autoscaling.knative.dev/class=hpa.autoscaling.knative.dev \
-         --scale-metric memory \
-         --scale-target=300
+        ${PROJECT_SOURCE}/scripts/enable-auto-scaling.sh memory 400
 
   - id: create-registry-push-secret
     exec:
