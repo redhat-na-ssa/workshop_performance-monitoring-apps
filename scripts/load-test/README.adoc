@@ -1,0 +1,5 @@
+= How to run
+
+1. create a `quay-secret.yml` file in the files folder
+2. log in locally using oc
+3. run: ansible-playbook playbook.yml

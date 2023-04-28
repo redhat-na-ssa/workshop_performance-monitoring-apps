@@ -1,0 +1,35 @@
+- name: Upload Benchmark
+  ansible.builtin.uri:
+    url: 'https://hyperfoil-instance-{{ item }}-hyperfoil.{{ route_subdomain }}/benchmark'
+    url_password: openshift
+    url_username: '{{ item }}'
+    force_basic_auth: true
+    validate_certs: false
+    method: POST
+    body_format: json
+    headers:
+      Content-Type: "application/json"
+    body: "{{ lookup('template', 'benchmark.json.j2') }}"
+    status_code: 200,201,204
+  register: r_benchmark
+  retries: 5
+  delay: 10
+  until: r_benchmark.status in [200, 201, 204]
+
+- name: Start Benchmark
+  ansible.builtin.uri:
+    url: 'https://hyperfoil-instance-{{ item }}-hyperfoil.{{ route_subdomain }}/benchmark/summit-lab-load-apps/start'
+    url_password: openshift
+    url_username: '{{ item }}'
+    force_basic_auth: true
+    validate_certs: false
+    method: GET
+    body_format: json
+    headers:
+      Content-Type: "application/json"
+    body: "{{ lookup('template', 'benchmark.json.j2') }}"
+    status_code: 200,201,202,204
+  register: r_benchmark
+  retries: 5
+  delay: 10
+  until: r_benchmark.status in [200, 201,202, 204]

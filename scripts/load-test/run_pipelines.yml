@@ -1,0 +1,25 @@
+- name: Evaluate Secret
+  kubernetes.core.k8s:
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    namespace: '{{ item }}-cicd'
+    resource_definition: "{{ lookup('file', 'quay-secret.yml') }}"
+
+- name: Link secret
+  ansible.builtin.command: oc secrets link pipeline quay-secret --for=pull,mount -n {{ item }}-cicd
+  register: my_output
+  changed_when: my_output.rc != 0
+
+- name: Evaluate PipelineRun
+  kubernetes.core.k8s:
+    validate_certs: '{{ verify_tls }}'
+    state: absent
+    namespace: '{{ item }}-cicd'
+    resource_definition: "{{ lookup('template', 'pipeline-run.yml.j2') }}"
+
+- name: Evaluate PipelineRun
+  kubernetes.core.k8s:
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    namespace: '{{ item }}-cicd'
+    resource_definition: "{{ lookup('template', 'pipeline-run.yml.j2') }}"

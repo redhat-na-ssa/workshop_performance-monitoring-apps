@@ -55,3 +55,4 @@ pg-conn-info.json
 .ignored
 scripts/hyperfoil/load-apps-scenarios.hf.yaml
 infrastructure/cicd/tekton/pipelines/all-apps-pipeline.yaml
+quay-secret.yml
