@@ -38,6 +38,12 @@ jobs:
   build_quarkus_native:
     runs-on: ubuntu-latest
     steps:
+      - name: Use variables
+        run: |
+          echo "Registry username : $REGISTRY_USERNAME"
+        env:
+          REGISTRY_USERNAME: ${{ inputs.registryUsername }}
+
       - name: Checkout code
         uses: actions/checkout@v3
 
