@@ -1,0 +1,77 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-apps
+spec:
+  params:
+    - name: git-url
+      default: ''
+      description: Git repo URL (CHANGE IT TO USE YOUR own GitHub ACCOUNT NAME!)
+      type: string
+    - name: git-revision
+      default: main
+      description: 'branch, tag, revision'
+      type: string
+    - name: app-name
+      description: 'App Name (maven project: quarkus-app | micronaut-app | springboot-app)'      
+      type: string
+    - name: clone-subdir
+      default: code-repo
+      description: sub-directory where the repo will be cloned into
+      type: string
+    - name: registry-url
+      default: quay.io
+      description: Container Registry URL
+      type: string
+    - name: registry-repo
+      description: Repository name in your Container Registry (usually your username)
+      type: string
+    - name: target-namespace
+      default: {{ item }}-staging
+      description: Namespace (project) where services will be deployed
+      type: string
+    - name: maven-mirror-url
+      default: http://nexus-sonatype-nexus-service.shared-maven-mirror.svc.cluster.local:8081/repository/maven-public
+      description: Maven Mirror Repo URL
+      type: string
+  tasks:
+
+
+    - name: deploy-quarkus
+      params:
+        - name: kn-image
+          value: >-
+            gcr.io/knative-releases/knative.dev/client/cmd/kn@sha256:ca767fde54bd76caf5654bc60a8447784f0989676b92ca8ff338f6bf8f00e2b6
+        - name: ARGS
+          value:
+            - service
+            - create
+            - $(params.app-name)
+            - '--image=$(params.registry-url)/$(params.registry-repo)/$(params.app-name):latest'
+            - '--probe-liveness=http:::/q/health/live'
+            - '--probe-liveness-opts=initialDelaySeconds=3,periodSeconds=30,failureThreshold=5,successThreshold=1,timeoutSeconds=10'
+            - '--probe-readiness=http:::/q/health/ready'
+            - '--probe-readiness-opts=initialDelaySeconds=3,periodSeconds=10,failureThreshold=5,successThreshold=1,timeoutSeconds=10' 
+            - '--request=cpu={{ serverless_app_cpu_request }},memory={{ serverless_app_memory_request }}'
+            - '--limit=cpu={{ serverless_app_cpu_limit }},memory={{ serverless_app_memory_limit }}'
+            - '--env=JAVA_MAX_MEM_RATIO=75.0'
+            - '--env=GC_MAX_HEAP_FREE_RATIO=25'
+            - '--label=app.openshift.io/runtime=quarkus'
+            - '--scale=0..3'
+            - --no-wait
+            - --force
+            - '--namespace=$(params.target-namespace)'
+      taskRef:
+        kind: ClusterTask
+        name: kn
+      when:
+        - input: "$(params.app-name)"
+          operator: in
+          values: ["quarkus-app"]
+
+
+
+  workspaces:
+    - name: shared-workspace
+    - name: maven-settings
+    - name: image-urls-cm

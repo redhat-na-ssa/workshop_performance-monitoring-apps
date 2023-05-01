@@ -4,9 +4,16 @@
     delete_demo: false
     verify_tls: false
     insecure_skip_tls_verify: true
-    num_users: 6
+    num_users: 20
     run_pipelines: false
     run_benchmarks: true
+    ultimate_benchmark_cpu: false
+    ultimate_benchmark_memory: true
+    benchmark: benchmark.json.j2
+    serverless_app_memory_limit: 1.5Gi
+    serverless_app_cpu_limit: 2
+    serverless_app_memory_request: 250Mi
+    serverless_app_cpu_request: 200m
   tasks:
     - name: Get openshift console
       kubernetes.core.k8s_info:
@@ -56,6 +63,11 @@
       when: run_benchmarks | bool
       until:
         - _services is succeeded
+
+    - name: Update Knative
+      ansible.builtin.include_tasks: update_serverless.yml
+      loop: '{{ users }}'
+      when: run_benchmarks | bool
 
     - name: Run Benchmarks
       ansible.builtin.include_tasks: run_benchmarks.yml

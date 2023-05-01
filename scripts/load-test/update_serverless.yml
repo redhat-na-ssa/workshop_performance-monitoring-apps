@@ -1,0 +1,27 @@
+- name: Update Autoscaler
+  ansible.builtin.command: kn service update quarkus-app --annotation autoscaling.knative.dev/class=hpa.autoscaling.knative.dev -n {{ item }}-staging
+  register: my_output
+  changed_when: my_output.rc != 0
+  when: (ultimate_benchmark_cpu | bool) or (ultimate_benchmark_memory | bool)
+
+- name: Update Autoscaler to Use CPU
+  ansible.builtin.command: kn service update quarkus-app --scale-metric cpu --scale-target=20 --no-wait -n {{ item }}-staging
+  register: my_output
+  changed_when: my_output.rc != 0
+  when: ultimate_benchmark_cpu | bool
+
+- name: Set benchmark to use CPU
+  ansible.builtin.set_fact:
+    benchmark: benchmark_ultimate_cpu.json.j2
+  when: ultimate_benchmark_cpu | bool
+
+- name: Update Autoscaler to Use Memory
+  ansible.builtin.command: kn service update quarkus-app --scale-metric memory --scale-target=400 --no-wait -n {{ item }}-staging
+  register: my_output
+  changed_when: my_output.rc != 0
+  when: ultimate_benchmark_memory | bool
+
+- name: Set benchmark to use Memory
+  ansible.builtin.set_fact:
+    benchmark: benchmark_ultimate_memory.json.j2
+  when: ultimate_benchmark_memory | bool

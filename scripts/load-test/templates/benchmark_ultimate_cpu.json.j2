@@ -1,0 +1,261 @@
+{%raw%}
+{
+  "name": "summit-lab-load-apps",
+  "http": [
+    {
+      "host": "{%endraw%}https://quarkus-app-{{ item }}-staging.{{ route_subdomain }}{%raw%}",
+      "name": "app-host",
+      "sharedConnections": "200"
+    }
+  ],
+  "ergonomics": {
+    "autoRangeCheck": false,
+    "stopOnInvalid": false
+  },
+  "agents": {
+    "agent-01": {
+      "node": "kubernetes.io/os=linux",
+      "extras": "-Dio.hyperfoil.jitter.watchdog.threshold=300",
+      "stop": true
+    },
+    "agent-02": {
+      "node": "kubernetes.io/os=linux",
+      "extras": "-Dio.hyperfoil.jitter.watchdog.threshold=300",
+      "stop": true
+    },
+    "agent-03": {
+      "node": "kubernetes.io/os=linux",
+      "extras": "-Dio.hyperfoil.jitter.watchdog.threshold=300",
+      "stop": true
+    }
+  },
+  "phases": [
+    {
+      "wakeUp": {
+        "atOnce": {
+          "users": 1,
+          "scenario": [
+            {
+              "serviceWakeup": [
+                {
+                  "httpRequest": {
+                    "GET": "/quarkus",
+                    "endpoint": "app-host",
+                    "sync": false,
+                    "timeout": "60s",
+                    "sla": {
+                      "blockedRatio": 1,
+                      "errorRatio": 1,
+                      "invalidRatio": 1,
+                      "meanResponseTime": "30s"
+                    }
+                  }
+                },
+                "awaitAllResponses"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "hello": {
+        "constantRate": {
+          "startAfterStrict": "wakeUp",
+          "usersPerSec": "10",
+          "maxSessions": 200,
+          "duration": "180s",
+          "scenario": [
+            {
+              "sayHello": [
+                {
+                  "httpRequest": {
+                    "GET": "/quarkus",
+                    "endpoint": "app-host"
+                  }
+                },
+                {
+                  "thinkTime": {
+                    "duration": "300 ms"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "cpuRampUp": {
+        "increasingRate": {
+          "initialUsersPerSec": 1,
+          "targetUsersPerSec": "10",
+          "maxSessions": 100,
+          "duration": "120s",
+          "startAfterStrict": [
+            "wakeUp"
+          ],
+          "scenario": [
+            {
+              "fetchCpu": [
+                {
+                  "set": {
+                    "var": "cpuIterations",
+                    "value": "35"
+                  }
+                },
+                {
+                  "set": {
+                    "var": "contextPath",
+                    "value": "/quarkus"
+                  }
+                },
+                {
+                  "httpRequest": {
+                    "GET": "${contextPath}/cpu?iterations=${cpuIterations}",
+                    "endpoint": "app-host"
+                  }
+                },
+                {
+                  "thinkTime": {
+                    "duration": "100 ms"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "cpuWithPersistence": {
+        "increasingRate": {
+          "initialUsersPerSec": 1,
+          "targetUsersPerSec": "10",
+          "maxSessions": 100,
+          "duration": "120s",
+          "startAfterStrict": [
+            "wakeUp",
+            "cpuRampUp"
+          ],
+          "scenario": [
+            {
+              "fetchCpu": [
+                {
+                  "set": {
+                    "var": "cpuIterations",
+                    "value": "35"
+                  }
+                },
+                {
+                  "set": {
+                    "var": "contextPath",
+                    "value": "/quarkus"
+                  }
+                },
+                {
+                  "httpRequest": {
+                    "GET": "${contextPath}/cpu?iterations=${cpuIterations}&db=true",
+                    "endpoint": "app-host"
+                  }
+                },
+                {
+                  "thinkTime": {
+                    "duration": "100 ms"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "memoryRampUp": {
+        "increasingRate": {
+          "initialUsersPerSec": 1,
+          "targetUsersPerSec": "10",
+          "maxSessions": 100,
+          "duration": "120s",
+          "startAfterStrict": [
+            "wakeUp",
+            "cpuRampUp"
+          ],
+          "scenario": [
+            {
+              "allocateMem": [
+                {
+                  "set": {
+                    "var": "memoryBytes",
+                    "value": "20"
+                  }
+                },
+                {
+                  "set": {
+                    "var": "contextPath",
+                    "value": "/quarkus"
+                  }
+                },
+                {
+                  "httpRequest": {
+                    "GET": "${contextPath}/memory?bites=${memoryBytes}",
+                    "endpoint": "app-host"
+                  }
+                },
+                {
+                  "thinkTime": {
+                    "duration": "100 ms"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "memoryWithPersistence": {
+        "increasingRate": {
+          "initialUsersPerSec": 1,
+          "targetUsersPerSec": "10",
+          "maxSessions": 100,
+          "duration": "120s",
+          "startAfterStrict": [
+            "wakeUp",
+            "memoryRampUp"
+          ],
+          "scenario": [
+            {
+              "allocateMem": [
+                {
+                  "set": {
+                    "var": "memoryBytes",
+                    "value": "20"
+                  }
+                },
+                {
+                  "set": {
+                    "var": "contextPath",
+                    "value": "/quarkus"
+                  }
+                },
+                {
+                  "httpRequest": {
+                    "GET": "${contextPath}/memory?bites=${memoryBytes}&db=true",
+                    "endpoint": "app-host"
+                  }
+                },
+                {
+                  "thinkTime": {
+                    "duration": "100 ms"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+{%endraw%}

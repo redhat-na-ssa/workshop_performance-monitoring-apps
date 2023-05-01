@@ -1,16 +1,19 @@
-- name: Evaluate Secret
+- name: Remove Pipelines
+  kubernetes.core.k8s:
+    validate_certs: '{{ verify_tls }}'
+    state: absent
+    namespace: '{{ item }}-cicd'
+    resource_definition: "{{ lookup('template', 'pipeline.yml.j2') }}"
+
+# We don't want to build images, so we need to replace the pipelines
+- name: Patch Pipelines
   kubernetes.core.k8s:
     validate_certs: '{{ verify_tls }}'
     state: present
     namespace: '{{ item }}-cicd'
-    resource_definition: "{{ lookup('file', 'quay-secret.yml') }}"
+    resource_definition: "{{ lookup('template', 'pipeline.yml.j2') }}"
 
-- name: Link secret
-  ansible.builtin.command: oc secrets link pipeline quay-secret --for=pull,mount -n {{ item }}-cicd
-  register: my_output
-  changed_when: my_output.rc != 0
-
-- name: Evaluate PipelineRun
+- name: Clear old PipelineRun
   kubernetes.core.k8s:
     validate_certs: '{{ verify_tls }}'
     state: absent

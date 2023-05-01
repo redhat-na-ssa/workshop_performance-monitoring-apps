@@ -9,7 +9,7 @@
     body_format: json
     headers:
       Content-Type: "application/json"
-    body: "{{ lookup('template', 'benchmark.json.j2') }}"
+    body: "{{ lookup('template', '{{ benchmark }}') }}"
     status_code: 200,201,204
   register: r_benchmark
   retries: 5
