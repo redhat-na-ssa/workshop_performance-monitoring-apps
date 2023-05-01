@@ -10,13 +10,13 @@ on:
         type: string
       registryUsername:
         description: 'Container Registry Username'
-        required: true
-        default: 'you registry username'
+        required: false
+        # default: 'you registry username'
         type: string
       registryUserToken:
         description: 'Container Registry User Token'
-        required: true
-        default: 'your registry token'
+        required: false
+        # default: 'your registry token'
         type: string
   # push:
     # branches: [main]
@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "Registry username : $REGISTRY_USERNAME"
         env:
-          REGISTRY_USERNAME: ${{ inputs.registryUsername }}
+          REGISTRY_USERNAME: ${{ inputs.registryUsername || secrets.REGISTRY_USERNAME }}
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -70,7 +70,8 @@ jobs:
         with:
           push: true
           tags: ${{ env.REGISTRY_URL }}/${{ env.PROJECT }}/${{ env.QUARKUS_APP }}-native:latest
-          file: ./quarkus-app/src/main/docker/Dockerfile.native
+          # file: ./quarkus-app/src/main/docker/Dockerfile.native
+          file: ./quarkus-app/src/main/docker/Dockerfile.native-micro
           context: ./quarkus-app/
 
   build_micronaut_native:
