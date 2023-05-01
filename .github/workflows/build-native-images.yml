@@ -32,7 +32,7 @@ on:
     #   - quarkus-app/**
 
 env:
-  REGISTRY_URL: ${{ inputs.registryUsername || 'quay.io' }}
+  REGISTRY_URL: ${{ inputs.registryUrl || 'quay.io' }}
   REGISTRY_USERNAME: ${{ inputs.registryUsername || secrets.REGISTRY_USERNAME }}
   REGISTRY_USER_TOKEN: ${{ inputs.registryUserToken || secrets.REGISTRY_TOKEN }}
   REGISTRY_ORG: ${{ inputs.registryOrg || 'redhat_na_ssa' }}
