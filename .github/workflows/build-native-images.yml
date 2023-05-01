@@ -1,4 +1,4 @@
-name: Build all docker containers
+name: Build native containers images
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY_URL: quay.io
-  PROJECT: redhat-na-ssa
+  PROJECT: redhat_na_ssa
   QUARKUS_APP: quarkus-app
   MICRONAUT_APP: micronaut-app
   SPRING_APP: springboot-app
@@ -30,14 +30,14 @@ jobs:
           version: 'latest'
           java-version: '17'
           components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GB_ACCESS_TOKEN }}
 
       - name: Log in to container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build quarkus-app with GraalVM
         run: cd quarkus-app && ./mvnw -Pnative package -Dquarkus.native.container-build=true
@@ -62,14 +62,14 @@ jobs:
           version: 'latest'
           java-version: '17'
           components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GB_ACCESS_TOKEN }}
 
       - name: Log in to container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build micronaut-app with GraalVM
         run: cd micronaut-app && ./mvnw package -Dpackaging=native-image
@@ -94,14 +94,14 @@ jobs:
           version: 'latest'
           java-version: '17'
           components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GB_ACCESS_TOKEN }}
 
       - name: Log in to container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build springboot-app with GraalVM
         run: |
