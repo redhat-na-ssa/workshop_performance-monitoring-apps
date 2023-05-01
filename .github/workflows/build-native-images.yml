@@ -11,12 +11,12 @@ on:
       registryUsername:
         description: 'Container Registry Username'
         required: true
-        default: 'you registry username'
+        default: ${{secrets.REGISTRY_USERNAME}} #'you registry username'
         type: string
       registryUserToken:
         description: 'Container Registry User Token'
         required: true
-        default: 'your registry token'
+        default: ${{secrets.REGISTRY_TOKEN }} #'your registry token'
         type: string
   # push:
     # branches: [main]
