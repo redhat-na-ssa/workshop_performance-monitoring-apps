@@ -1,13 +1,30 @@
 name: Build native containers images
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/build-native-images.yml
-      - micronaut-app/**
-      - springboot-app/**
-      - quarkus-app/**
+  workflow_dispatch:
+    inputs:
+      registryUrl:
+        description: 'Container Registry URL'
+        required: true
+        default: 'quay.io'
+        type: string
+      registryUsername:
+        description: 'Container Registry Username'
+        required: true
+        default: '${{ secrets.REGISTRY_USERNAME }}'
+        type: string
+      registryUserToken:
+        description: 'Container Registry User Token'
+        required: true
+        default: '${{ secrets.REGISTRY_TOKEN }}'
+        type: string
+  # push:
+    # branches: [main]
+    # paths:
+    #   - .github/workflows/build-native-images.yml
+    #   - micronaut-app/**
+    #   - springboot-app/**
+    #   - quarkus-app/**
 
 env:
   REGISTRY_URL: quay.io
