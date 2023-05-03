@@ -45,13 +45,6 @@ jobs:
   build_quarkus_native:
     runs-on: ubuntu-latest
     steps:
-      # - name: Use variables
-      #   run: |
-      #     echo "Registry url      : $REGISTRY_URL"
-      #     echo "Registry org      : $REGISTRY_ORG"
-      #     echo "Registry username : $REGISTRY_USERNAME"
-      #     echo "Registry token    : $REGISTRY_USER_TOKEN"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
