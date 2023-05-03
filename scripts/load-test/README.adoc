@@ -1,6 +1,0 @@
-= How to run
-
-1. Set if you want to run benchmarks and the pipelines using: `run_pipelines` and `run_benchmarks`
-2. You can use the ultimate test using: `ultimate_benchmark_cpu` or `ultimate_benchmark_memory`
-3. Log in to your OCP Cluster using *oc*    
-4. run: *ansible-playbook playbook.yml*
