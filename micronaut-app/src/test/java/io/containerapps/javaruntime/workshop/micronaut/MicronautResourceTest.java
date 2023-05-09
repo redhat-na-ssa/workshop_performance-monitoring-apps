@@ -4,27 +4,14 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-// import org.testcontainers.containers.PostgreSQLContainer;
-// import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
 
-// @Testcontainers
 @MicronautTest
 class MicronautResourceTest {
 
     private static String basePath = "http://localhost:8802/micronaut";
-
-    // private PostgreSQLContainer postgreSQLContainer;
-
-    // @BeforeEach
-    // public void setUp() {
-    //     postgreSQLContainer = new PostgreSQLContainer("postgres:14")
-    //         .withDatabaseName("postgres")
-    //         .withUsername("postgres")
-    //         .withPassword("password");
-    // }
 
     @Test
     public void testHelloEndpoint(RequestSpecification spec) {

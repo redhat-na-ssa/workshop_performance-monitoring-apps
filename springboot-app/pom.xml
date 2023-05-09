@@ -11,7 +11,7 @@
     <groupId>io.containerapps.javaruntime.workshop</groupId>
     <artifactId>springboot-app</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <description>Modern Cloud-native Java runtimes performance monitoring on Red Hat Openshift :: SpringBoot</description>
+    <name>Modern Cloud-native Java runtimes performance monitoring on Red Hat Openshift :: SpringBoot</name>
     <properties>
         <java.version>17</java.version>
         <logback.contrib.version>0.1.5</logback.contrib.version>
@@ -45,7 +45,6 @@
         Json logging will be enabled by default in 'production' profile.
         To start springboot with json logging pass 'spring_profiles_active=production,json-logging' 
         as a env var during initialization
-        -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -81,35 +80,21 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-
-        <!-- Enable Micrometer for prometheus metrics.
-         Default metrics are exposed though /actuator/prometheus endpoint
-        
-        # Sample Prometheus config
-        # This assumes that your Prometheus instance can access this application on localhost:8080
-
-        global:
-        scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-        evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-        # scrape_timeout is set to the global default (10s).
-
-        scrape_configs:
-        - job_name: 'spring boot scrape'
-            metrics_path: '/actuator/prometheus'
-            scrape_interval: 5s
-            static_configs:
-            - targets: ['localhost:8080']
         -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <scope>runtime</scope>
         </dependency>        
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        <!-- Enable Micrometer for prometheus metrics.
+         Default metrics are exposed though /actuator/prometheus endpoint
+         <dependency>
+             <groupId>io.micrometer</groupId>
+             <artifactId>micrometer-registry-prometheus</artifactId>
+             <scope>runtime</scope>
+         </dependency>
+        -->
 
         <!-- -->
         <dependency>

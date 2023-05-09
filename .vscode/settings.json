@@ -62,5 +62,9 @@
       "**/*.sw.yaml"
     ],
     "https://raw.githubusercontent.com/Hyperfoil/Hyperfoil/e18bfb186d30babc09e9fb110d284d1d16b84661/distribution/src/main/resources/schema.json": "/*.hf.yaml"
-  }
+  },
+  "security.workspace.trust.startupPrompt": "never",
+  "security.workspace.trust.enabled": false,
+  "security.workspace.trust.banner": "never",
+  "security.workspace.trust.emptyWindow": false,
 }

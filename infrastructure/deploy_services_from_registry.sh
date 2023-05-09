@@ -1,10 +1,15 @@
 #!/bin/sh
 
+clear
+echo
+read -e -p "Enter a project namespaces as the deployment target (Enter to accept default value): " -i "$(oc whoami)-staging" NAMESPACE
+[[ -z $NAMESPACE ]] && echo "Project namespace required" && exit 1
+
 oc whoami
-oc project
+# oc project $NAMESPACE
 
 kn service create quarkus-app \
- --image=quay.io/rafaeltuelho/quarkus-app:latest \
+ --image=quay.io/redhat_na_ssa/quarkus-app:latest \
  --probe-liveness='http:::/q/health/live' \
  --probe-liveness-opts='initialDelaySeconds=3,periodSeconds=30,failureThreshold=3,successThreshold=1,timeoutSeconds=10' \
  --probe-readiness='http:::/q/health/ready' \
@@ -16,6 +21,7 @@ kn service create quarkus-app \
  --label=app.openshift.io/runtime=quarkus \
  --scale=0..3 \
  --no-wait \
+ -n $NAMESPACE \
  --force
 # use when # of cpu >= 2 and heap mem <=4gb
 # --env=GC_CONTAINER_OPTIONS='-XX:+UseSerialGC' \
@@ -28,7 +34,7 @@ kn service create quarkus-app \
         #   value: "-XX:ActiveProcessorCount=2"
 
  kn service create micronaut-app \
- --image=quay.io/rafaeltuelho/micronaut-app:latest \
+ --image=quay.io/redhat_na_ssa/micronaut-app:latest \
  --probe-liveness='http:::/health' \
  --probe-liveness-opts='initialDelaySeconds=3,periodSeconds=30,failureThreshold=3,successThreshold=1,timeoutSeconds=10' \
  --probe-readiness='http:::/health' \
@@ -40,10 +46,11 @@ kn service create quarkus-app \
  --label=app.openshift.io/runtime=java \
  --scale=0..3 \
  --no-wait \
+ -n $NAMESPACE \
  --force
 
  kn service create springboot-app \
- --image=quay.io/rafaeltuelho/springboot-app:latest \
+ --image=quay.io/redhat_na_ssa/springboot-app:latest \
  --probe-liveness='http:::/actuator/health/liveness' \
  --probe-liveness-opts='initialDelaySeconds=7,periodSeconds=30,failureThreshold=3,successThreshold=1,timeoutSeconds=10' \
  --probe-readiness='http:::/actuator/health/readiness' \
@@ -56,4 +63,5 @@ kn service create quarkus-app \
  --label=app.openshift.io/runtime=spring-boot \
  --scale=0..3 \
  --no-wait \
+ -n $NAMESPACE \
  --force

@@ -6,11 +6,6 @@ micronaut:
     thread-selection: IO
   metrics:
     enabled: true
-    export:
-      prometheus:
-        enabled: true
-        step: PT1M
-        descriptions: true
 
 netty:
   default:
@@ -38,7 +33,3 @@ jpa:
         hbm2ddl:
           auto: update
         show_sql: true
-
-endpoints:
-  prometheus:
-    sensitive: false

@@ -94,7 +94,6 @@
      Json logging will be enabled by default in 'prod' environemnt.
      To start micronaut with json logging pass `-Dlogback.configurationFile=logback-json.xml` 
      as a JVM system property during initialization
-    -->
     <dependency>
       <groupId>ch.qos.logback.contrib</groupId>
       <artifactId>logback-json-classic</artifactId>
@@ -105,18 +104,19 @@
       <artifactId>logback-jackson</artifactId>
       <version>0.1.5</version>
     </dependency>
-
-    <!-- Enable Micrometer for prometheus metrics.
-     Default metrics are exposed though /metrics and prometheus metrics thorugh /prometheus endpoint
     -->
+
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-management</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.micronaut.micrometer</groupId>
-      <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
-    </dependency>
+    <!-- Enable Micrometer for prometheus metrics.
+     Default metrics are exposed though /metrics and prometheus metrics thorugh /prometheus endpoint
+      <dependency>
+        <groupId>io.micronaut.micrometer</groupId>
+        <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
+      </dependency>
+    -->
 
     <!-- testing -->
     <dependency>

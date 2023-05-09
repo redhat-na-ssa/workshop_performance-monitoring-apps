@@ -12,12 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-// , properties = {
-//     "server.port=8803",
-//     "spring.datasource.url=jdbc:tc:postgresql:14-alpine://testcontainers/postgres",
-//     "spring.datasource.username=postgres",
-//     "spring.datasource.password=password"
-// })
 class SpringbootResourceTest {
 
     private static String basePath = "http://localhost:8703/springboot";
