@@ -1,0 +1,71 @@
+name: Build Springboot native container image
+
+on:
+  workflow_dispatch:
+    inputs:
+      registryUrl:
+        description: 'Container Registry URL'
+        required: true
+        default: 'quay.io'
+        type: string
+      registryOrg:
+        description: 'Container Registry Organization/Account name'
+        required: false
+        # default: 'your registry organizations or account name'
+        type: string
+      registryUsername:
+        description: 'Container Registry Username'
+        required: false
+        # default: 'you registry username'
+        type: string
+      registryUserToken:
+        description: 'Container Registry User Token'
+        required: false
+        # default: 'your registry token'
+        type: string
+  # push:
+    # branches: [main]
+    # paths:
+    #   - .github/workflows/build-springbootnative-image.yml
+    #   - springboot-app/**
+
+env:
+  REGISTRY_URL: ${{ inputs.registryUrl || 'quay.io' }}
+  REGISTRY_USERNAME: ${{ inputs.registryUsername || secrets.REGISTRY_USERNAME }}
+  REGISTRY_USER_TOKEN: ${{ inputs.registryUserToken || secrets.REGISTRY_TOKEN }}
+  REGISTRY_ORG: ${{ inputs.registryOrg || 'redhat_na_ssa' }}
+  SPRING_APP: springboot-app
+
+jobs:
+  build_sprinboot_native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GB_ACCESS_TOKEN }}
+
+      - name: Log in to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_USER_TOKEN }}
+
+      - name: Build springboot-app with GraalVM
+        run: |
+          cd springboot-app && ./mvnw -Pnative native:compile
+
+      - name: Build springboot-app native Docker image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_ORG }}/${{ env.SPRING_APP }}-native:latest
+          file: ./springboot-app/src/main/docker/Dockerfile.native
+          context: ./springboot-app/
