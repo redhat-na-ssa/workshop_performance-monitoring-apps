@@ -14,17 +14,17 @@ components:
       endpoints:
         - exposure: public
           name: quarkus-app
-          protocol: http
+          protocol: https
           targetPort: 8701
           path: /quarkus
         - exposure: public
           name: micronaut-app
-          protocol: http
+          protocol: https
           targetPort: 8702
           path: /micronaut
         - exposure: public
           name: springboot-app
-          protocol: http
+          protocol: https
           targetPort: 8703
           path: /springboot
       volumeMounts:
@@ -189,14 +189,14 @@ commands:
     exec:
       label: '99: Switch to Java 17'
       component: "tools"
-      # workingDir: '${PROJECT_SOURCE}'
+      workingDir: "${PROJECT_SOURCE}"
       commandLine: |
         [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
         sdk default java 17.0.7-tem
         #copy maven settings pointing to in-cluster nexus mirror
         [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
         # setup git credential store
-        git config --global credential.helper store
+        git config --local credential.helper store
 events:
   postStart:
     - switch-to-java-17 # <== Start of the workspace happens after this command is completed

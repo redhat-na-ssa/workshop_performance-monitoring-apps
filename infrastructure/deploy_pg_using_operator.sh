@@ -71,11 +71,11 @@ then
    # sample output
    # {
    #   "user": "postgres",
-   #   "password": "@a)y?jK2hO/(FblaJ@,hwv0J",
+   #   "password": "secret",
    #   "host": "postgres-primary.sandbox.svc",
    #   "dbname": "postgres",
-   #   "uri": "postgresql://postgres:%40a%29y%3FjK2hO%2F%28FblaJ%40,hwv0J@postgres-primary.sandbox.svc:5432/postgres",
-   #   "verifier": "SCRAM-SHA-256$4096:dx/lre7Yh5vKxV7ognryUg==$wypAIBxmEgAzPCqi94O7ME3+0+tqLlPh+6h8TN1Q8GM=:2iY6d1RYEtyMU60Y5IZp1wXGhwkhGHj6RYQ25gWBrDc="
+   #   "uri": "postgresql://postgres@postgres-primary.sandbox.svc:5432/postgres",
+   #   "verifier": ""
    # }
 else
    echo

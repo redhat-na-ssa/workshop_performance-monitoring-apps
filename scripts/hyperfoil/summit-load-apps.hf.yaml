@@ -89,7 +89,7 @@ phases:
             var: contextPath
             value: !param APP_CONTEXT_PATH
         - httpRequest:
-            GET: ${contextPath}/cpu?iterations=${cpuIterations}
+            GET: ${contextPath}/cpu?iterations=${cpuIterations}&desc=Agent:${hyperfoil.agent.id},RunId:${hyperfoil.run.id},Phase:${hyperfoil.phase.name},Iteration:${hyperfoil.phase.iteration},SessionId:${hyperfoil.session.id}
             endpoint: app-host
         - thinkTime:
             duration: 100 ms
@@ -112,7 +112,7 @@ phases:
             var: contextPath
             value: !param APP_CONTEXT_PATH
         - httpRequest:
-            GET: ${contextPath}/cpu?iterations=${cpuIterations}&db=true
+            GET: ${contextPath}/cpu?iterations=${cpuIterations}&db=true&desc=Agent:${hyperfoil.agent.id},RunId:${hyperfoil.run.id},Phase:${hyperfoil.phase.name},Iteration:${hyperfoil.phase.iteration},SessionId:${hyperfoil.session.id}
             endpoint: app-host
         - thinkTime:
             duration: 100 ms
@@ -135,7 +135,7 @@ phases:
             var: contextPath
             value: !param APP_CONTEXT_PATH
         - httpRequest:
-            GET: ${contextPath}/memory?bites=${memoryBytes}
+            GET: ${contextPath}/memory?bites=${memoryBytes}&desc=Agent:${hyperfoil.agent.id},RunId:${hyperfoil.run.id},Phase:${hyperfoil.phase.name},Iteration:${hyperfoil.phase.iteration},SessionId:${hyperfoil.session.id}
             endpoint: app-host
         - thinkTime:
             duration: 100 ms
@@ -158,7 +158,7 @@ phases:
             var: contextPath
             value: !param APP_CONTEXT_PATH
         - httpRequest:
-            GET: ${contextPath}/memory?bites=${memoryBytes}&db=true
+            GET: ${contextPath}/memory?bites=${memoryBytes}&db=true&desc=Agent:${hyperfoil.agent.id},RunId:${hyperfoil.run.id},Phase:${hyperfoil.phase.name},Iteration:${hyperfoil.phase.iteration},SessionId:${hyperfoil.session.id}
             endpoint: app-host
         - thinkTime:
             duration: 100 ms

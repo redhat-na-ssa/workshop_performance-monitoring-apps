@@ -66,6 +66,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_ORG }}/${{ env.SPRING_APP }}-native:latest
+          tags: ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_ORG }}/${{ env.SPRING_APP }}:native
           file: ./springboot-app/src/main/docker/Dockerfile.native
           context: ./springboot-app/

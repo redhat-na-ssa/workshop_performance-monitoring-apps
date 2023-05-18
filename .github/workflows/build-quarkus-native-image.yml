@@ -65,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_ORG }}/${{ env.QUARKUS_APP }}-native:latest
+          tags: ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_ORG }}/${{ env.QUARKUS_APP }}:native
           # file: ./quarkus-app/src/main/docker/Dockerfile.native
           file: ./quarkus-app/src/main/docker/Dockerfile.native-micro
           context: ./quarkus-app/
