@@ -13,16 +13,6 @@ on:
         required: false
         # default: 'your registry organizations or account name'
         type: string
-      registryUsername:
-        description: 'Container Registry Username'
-        required: false
-        # default: 'you registry username'
-        type: string
-      registryUserToken:
-        description: 'Container Registry User Token'
-        required: false
-        # default: 'your registry token'
-        type: string
   # push:
     # branches: [main]
     # paths:
@@ -31,8 +21,8 @@ on:
 
 env:
   REGISTRY_URL: ${{ inputs.registryUrl || 'quay.io' }}
-  REGISTRY_USERNAME: ${{ inputs.registryUsername || secrets.REGISTRY_USERNAME }}
-  REGISTRY_USER_TOKEN: ${{ inputs.registryUserToken || secrets.REGISTRY_TOKEN }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_USER_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
   REGISTRY_ORG: ${{ inputs.registryOrg || 'redhat_na_ssa' }}
   QUARKUS_APP: quarkus-app
 

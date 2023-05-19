@@ -68,7 +68,7 @@ phases:
             endpoint: app-host
         # Wait 3 seconds to simulate user-interaction
         - thinkTime:
-            duration: 300 ms
+            duration: 50 ms
 
 - cpuRampUp:
     increasingRate:
