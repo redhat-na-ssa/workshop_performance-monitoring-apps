@@ -27,8 +27,8 @@ do
           kn service update ${svc} -n "$OCP_USER-staging" \
             --annotation autoscaling.knative.dev/class=kpa.autoscaling.knative.dev \
             --scale-metric concurrency \
-            --scale-target=10 \
-            --no-wait
+            --scale-target=10
+            # --no-wait
         fi
       done
       echo

@@ -54,7 +54,7 @@ phases:
 - hello:
     constantRate:
       startAfterStrict: wakeUp # will wait until the wakeUp phase is TERMINATED (all requests done!)
-      # 10 users will be starting the scenario every second (during 120s)
+      # 10 users will be starting the scenario every second (during 60s)
       usersPerSec: !param USERS_PER_SEC 10 # run the scenario 'n' times per second in average
       maxSessions: 200
       duration: 180s #let it run for about 3min...
@@ -76,7 +76,7 @@ phases:
       targetUsersPerSec: !param USERS_PER_SEC 10
       # We expect at most n users being active at one moment - see below
       maxSessions: 100
-      duration: !param PHASE_DURATION_SECS 120s
+      duration: !param PHASE_DURATION_SECS 60s
       #maxIterations: !param LOOP 1
       startAfterStrict: 
       - wakeUp
@@ -99,7 +99,7 @@ phases:
       initialUsersPerSec: 1
       targetUsersPerSec: !param USERS_PER_SEC 10
       maxSessions: 100
-      duration: !param PHASE_DURATION_SECS 120s
+      duration: !param PHASE_DURATION_SECS 60s
       startAfterStrict: 
       - wakeUp
       - cpuRampUp
@@ -122,7 +122,7 @@ phases:
       initialUsersPerSec: 1
       targetUsersPerSec: !param USERS_PER_SEC 10
       maxSessions: 100   
-      duration: !param PHASE_DURATION_SECS 120s
+      duration: !param PHASE_DURATION_SECS 60s
       startAfterStrict: 
       - wakeUp
       - cpuRampUp
@@ -145,7 +145,7 @@ phases:
       initialUsersPerSec: 1
       targetUsersPerSec: !param USERS_PER_SEC 10
       maxSessions: 100
-      duration: !param PHASE_DURATION_SECS 120s
+      duration: !param PHASE_DURATION_SECS 60s
       startAfterStrict: 
       - wakeUp
       - memoryRampUp

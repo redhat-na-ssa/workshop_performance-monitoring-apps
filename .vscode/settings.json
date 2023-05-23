@@ -67,4 +67,5 @@
   "security.workspace.trust.enabled": false,
   "security.workspace.trust.banner": "never",
   "security.workspace.trust.emptyWindow": false,
+  "ansible.python.interpreterPath": "/usr/local/bin/python3",
 }

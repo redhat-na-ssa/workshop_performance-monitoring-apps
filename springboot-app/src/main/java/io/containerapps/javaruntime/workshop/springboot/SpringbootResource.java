@@ -60,7 +60,7 @@ public class SpringbootResource {
         if (db) {
             Statistics statistics = new Statistics();
             statistics.type = Type.CPU;
-            statistics.parameter = iterations.toString();
+            statistics.parameter = iterationsDone.toString();
             statistics.duration = Duration.between(start, Instant.now());
             statistics.description = desc;
             repository.save(statistics);

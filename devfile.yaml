@@ -195,8 +195,11 @@ commands:
         sdk default java 17.0.7-tem
         #copy maven settings pointing to in-cluster nexus mirror
         [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
-        # setup git credential store
+        # setup git default config
         git config --local credential.helper store
+        git config --local pull.rebase true
+        git config --local fetch.prune true
+        git config --local diff.colorMoved zebra
 events:
   postStart:
     - switch-to-java-17 # <== Start of the workspace happens after this command is completed
