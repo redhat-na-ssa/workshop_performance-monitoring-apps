@@ -12,6 +12,8 @@ components:
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
+        - name: USE_JAVA17
+          value: 'true'
       endpoints:
         - exposure: public
           name: quarkus-app
@@ -186,16 +188,16 @@ commands:
         oc login -u $(echo $DEVWORKSPACE_NAMESPACE | cut -d'-' -f 1) "https://$KUBERNETES_SERVICE_HOST:443" --insecure-skip-tls-verify=true
         oc project $DEVWORKSPACE_NAMESPACE
 
-  - id: switch-to-java-17
+  - id: init-setup
     exec:
-      label: '99: Switch to Java 17'
+      label: '99: initial setup'
       component: "tools"
       workingDir: "${PROJECT_SOURCE}"
       commandLine: |
         #if sdkman is present use it
         [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk default java 17.0.7-tem
         #if no sdkaman do it manually
-        [[ -d /usr/lib/jvm/java-17-openjdk ]] && rm -rf ${HOME}/.java/current/* && ln -s /usr/lib/jvm/java-17-openjdk/* ${HOME}/.java/current
+        #[[ -d /usr/lib/jvm/java-17-openjdk ]] && rm -rf ${HOME}/.java/current/* && ln -s /usr/lib/jvm/java-17-openjdk/* ${HOME}/.java/current
         #copy maven settings pointing to in-cluster nexus mirror
         [[ -s "$PROJECT_SOURCE/settings.xml" ]] && cp -v $PROJECT_SOURCE/settings.xml $HOME/.m2/
         #setup git default config
@@ -203,6 +205,9 @@ commands:
         git config --local pull.rebase true
         git config --local fetch.prune true
         git config --local diff.colorMoved zebra
+        echo "source /usr/share/bash-completion/completions/git" >> /home/user/.bashrc
+        oc completion bash > /home/user/.oc_bash_completion
+        echo "source /home/user/.oc_bash_completion" >> /home/user/.bashrc
 events:
   postStart:
-    - switch-to-java-17 # <== Start of the workspace happens after this command is completed
+    - init-setup # <== Start of the workspace happens after this command is completed
