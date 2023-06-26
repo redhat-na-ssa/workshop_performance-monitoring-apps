@@ -208,6 +208,7 @@ commands:
         echo "source /usr/share/bash-completion/completions/git" >> /home/user/.bashrc
         oc completion bash > /home/user/.oc_bash_completion
         echo "source /home/user/.oc_bash_completion" >> /home/user/.bashrc
+        curl -L https://open-vsx.org/api/cnshenj/vscode-task-manager/1.0.0/file/cnshenj.vscode-task-manager-1.0.0.vsix -o $HOME/cnshenj.vscode-task-manager-1.0.0.vsix
 events:
   postStart:
     - init-setup # <== Start of the workspace happens after this command is completed

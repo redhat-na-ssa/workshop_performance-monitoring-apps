@@ -30,7 +30,7 @@
       "org.hamcrest.Matchers.*",
       "org.assertj.core.api.Assertions.*"
     ],
-  "java.jdt.ls.vmargs": "-Xmx2G -Xms512m -Xlog:disable",
+  "java.jdt.ls.vmargs": "-Xmx1G -Xms512m -Xlog:disable",
   "java.import.generatesMetadataFilesAtProjectRoot": true,
   "java.errors.incompleteClasspath.severity": "ignore",
   "java.typeHierarchy.lazyLoad": true,
@@ -54,7 +54,7 @@
     ""
   ],
   "java.compile.nullAnalysis.mode": "disabled",
-  "java.server.launchMode": "LightWeight",
+  "java.server.launchMode": "Hybrid",
   "microprofile.tools.validation.enabled": false,
   "yaml.schemas": {
     "https://serverlessworkflow.io/schemas/0.8/workflow.json": [
