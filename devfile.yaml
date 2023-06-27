@@ -5,10 +5,10 @@ components:
 ### Workspace Tools Container
   - name: tools
     container:
-      # image: quay.io/redhat_na_ssa/universal-developer-image:ubi8-latest # our fork - 2.0GB compressed
-      # image: quay.io/devfile/universal-developer-image@sha256:80fdd1ae37d3b9e0260d9c66b4ff12e35317c31243eabeea5212d98c537a3ba9 # upstream - 3.7GB compressed
-      # image: registry.redhat.io/devspaces/udi-rhel8:latest #1.7GB compressed
-      image: registry.redhat.io/devspaces/udi-rhel8@sha256:d18f22ef1aa2e5d1da4e3356ee1fc8fa59f795cdc3ab9d54c666054fbcfecd8f
+      image: quay.io/redhat_na_ssa/universal-developer-image:ubi8-latest # our fork - 2.0GB compressed
+      #image: quay.io/devfile/universal-developer-image@sha256:80fdd1ae37d3b9e0260d9c66b4ff12e35317c31243eabeea5212d98c537a3ba9 # upstream - 3.7GB compressed
+      #image: registry.redhat.io/devspaces/udi-rhel8:latest #1.7GB compressed
+      #image: registry.redhat.io/devspaces/udi-rhel8@sha256:d18f22ef1aa2e5d1da4e3356ee1fc8fa59f795cdc3ab9d54c666054fbcfecd8f
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -160,20 +160,11 @@ commands:
 
   - id: create-registry-push-secret
     exec:
-      label: '13: Create Registry Push Secret'
+      label: '13: Link Secret to Pipeline SA'
       component: "tools"
       commandLine: |
-        clear
-        echo
-        read -e -p $"Make sure you have your registry token inside the \n'${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml' file \nhit enter to proceed." ok
-        echo
-        echo "current content of your secret file:"
-        cat ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml
-
-        oc apply -f ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml -n "$(oc whoami)-cicd"
-        oc apply -f ${PROJECT_SOURCE}/infrastructure/cicd/tekton/setup/quay.io-dockercfg-secret.yaml -n "$(oc whoami)-staging"
-        oc secrets link pipeline quay-push-secret --for=pull,mount -n "$(oc whoami)-cicd"
-        oc secrets link default quay-push-secret --for=pull,mount -n "$(oc whoami)-staging"
+          clear
+          oc secrets link pipeline quay-secret --for=pull,mount -n "$(oc whoami)-cicd"
 
   - id: oc-login
     exec:
