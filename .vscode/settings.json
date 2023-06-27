@@ -54,7 +54,7 @@
     ""
   ],
   "java.compile.nullAnalysis.mode": "disabled",
-  "java.server.launchMode": "Hybrid",
+  "java.server.launchMode": "Standard",
   "microprofile.tools.validation.enabled": false,
   "yaml.schemas": {
     "https://serverlessworkflow.io/schemas/0.8/workflow.json": [
