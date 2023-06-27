@@ -2,7 +2,7 @@ name: summit-lab-load-apps
 http:
 - host: !param APP_URL #http://quarkus-app:8080
   name: app-host
-  sharedConnections: !param SHARED_CONN 200 #evenly distributed among agents and threads.
+  sharedConnections: !param SHARED_CONN 400 #evenly distributed among agents and threads.
 
 ergonomics: # Disable stopping the scenario on 4xx or 5xx response
   autoRangeCheck: false
