@@ -112,11 +112,11 @@
     </dependency>
     <!-- Enable Micrometer for prometheus metrics.
      Default metrics are exposed though /metrics and prometheus metrics thorugh /prometheus endpoint
-      <dependency>
-        <groupId>io.micronaut.micrometer</groupId>
-        <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
-      </dependency>
     -->
+    <dependency>
+      <groupId>io.micronaut.micrometer</groupId>
+      <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
+    </dependency>
 
     <!-- testing -->
     <dependency>

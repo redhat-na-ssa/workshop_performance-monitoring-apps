@@ -79,12 +79,12 @@
 
     <!-- Enable Micrometer for prometheus metrics.
      Default metrics are exposed though /q/metrics endpoint
-     <dependency>
+    -->
+    <dependency>
        <groupId>io.quarkus</groupId>
        <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
-      </dependency>
-    -->
-
+    </dependency>
+    
     <!-- testing -->
     <dependency>
       <groupId>io.quarkus</groupId>

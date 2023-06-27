@@ -89,12 +89,12 @@
         </dependency>        
         <!-- Enable Micrometer for prometheus metrics.
          Default metrics are exposed though /actuator/prometheus endpoint
-         <dependency>
-             <groupId>io.micrometer</groupId>
-             <artifactId>micrometer-registry-prometheus</artifactId>
-             <scope>runtime</scope>
-         </dependency>
         -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- -->
         <dependency>
