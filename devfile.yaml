@@ -208,7 +208,11 @@ commands:
         echo "source /usr/share/bash-completion/completions/git" >> /home/user/.bashrc
         oc completion bash > /home/user/.oc_bash_completion
         echo "source /home/user/.oc_bash_completion" >> /home/user/.bashrc
+        # install task-manager extension
         curl -L https://open-vsx.org/api/cnshenj/vscode-task-manager/1.0.0/file/cnshenj.vscode-task-manager-1.0.0.vsix -o $HOME/cnshenj.vscode-task-manager-1.0.0.vsix
+        export VSCODE_AGENT_FOLDER=/checode/remote
+        cd /checode/checode-linux-libc
+        ./node out/server-main.js --install-extension $HOME/cnshenj.vscode-task-manager-1.0.0.vsix
 events:
   postStart:
     - init-setup # <== Start of the workspace happens after this command is completed
