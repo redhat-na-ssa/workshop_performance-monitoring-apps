@@ -6,7 +6,7 @@
   <artifactId>parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Modern Cloud-native Java runtimes performance monitoring on Red Hat Openshift!</name>
+  <name>Java Performance Monitoring on OpenShift!</name>
   <modules>
     <module>micronaut-app</module>
     <module>springboot-app</module>
