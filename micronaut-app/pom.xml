@@ -12,7 +12,7 @@
   <artifactId>micronaut-app</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>${packaging}</packaging>
-  <name>Modern Cloud-native Java runtimes performance monitoring on Red Hat Openshift :: Micronaut</name>
+  <name>Java Performance Monitoring on OpenShift :: Micronaut</name>
 
   <properties>
     <packaging>jar</packaging>

@@ -10,7 +10,7 @@
   <groupId>io.containerapps.javaruntime.workshop</groupId>
   <artifactId>quarkus-app</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>Modern Cloud-native Java runtimes performance monitoring on Red Hat Openshift :: Quarkus</name>
+  <name>Java Performance Monitoring on OpenShift :: Quarkus</name>
   <properties>
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
