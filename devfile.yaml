@@ -6,7 +6,7 @@ components:
   - name: tools
     container:
       image: quay.io/redhat_na_ssa/universal-developer-image:ubi8-latest # our fork - 2.0GB compressed
-      #image: quay.io/devfile/universal-developer-image@sha256:80fdd1ae37d3b9e0260d9c66b4ff12e35317c31243eabeea5212d98c537a3ba9 # upstream - 3.7GB compressed
+      #image: quay.io/devfile/universal-developer-image:latest# upstream - 3.7GB compressed
       #image: registry.redhat.io/devspaces/udi-rhel8:latest #1.7GB compressed
       #image: registry.redhat.io/devspaces/udi-rhel8@sha256:d18f22ef1aa2e5d1da4e3356ee1fc8fa59f795cdc3ab9d54c666054fbcfecd8f
       env:
@@ -199,12 +199,6 @@ commands:
         echo "source /usr/share/bash-completion/completions/git" >> /home/user/.bashrc
         oc completion bash > /home/user/.oc_bash_completion
         echo "source /home/user/.oc_bash_completion" >> /home/user/.bashrc
-        # install vscode extensions
-        curl -L https://open-vsx.org/api/cnshenj/vscode-task-manager/1.0.0/file/cnshenj.vscode-task-manager-1.0.0.vsix -o $HOME/cnshenj.vscode-task-manager-1.0.0.vsix
-        export VSCODE_AGENT_FOLDER=/checode/remote
-        cd /checode/checode-linux-libc
-        ./node out/server-main.js --install-extension redhat.vscode-quarkus
-        ./node out/server-main.js --install-extension $HOME/cnshenj.vscode-task-manager-1.0.0.vsix
 events:
   postStart:
     - init-setup # <== Start of the workspace happens after this command is completed
